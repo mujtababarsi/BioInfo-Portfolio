@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mohamed Elmugtaba | Bioinformatician & Pharmacist</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --canva-blue: #00C4CC;
+            --canva-purple: #7D2AE8;
+            --dark: #1A1A1A;
+            --light: #F7F8FA;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--dark); color: white; overflow: hidden; }
+
+        .deck { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scroll-behavior: smooth; }
+        .slide { 
+            height: 100vh; width: 100%; display: flex; flex-direction: column; 
+            justify-content: center; align-items: center; scroll-snap-align: start; 
+            padding: 60px; position: relative; overflow: hidden;
+        }
+
+        .slide > * { opacity: 0; transform: translateY(40px); transition: all 0.8s cubic-bezier(0.22, 1, 0.36, 1); }
+        .slide.active > * { opacity: 1; transform: translateY(0); }
+
+        /* Slide Styles */
+        .hero { background: linear-gradient(135deg, var(--canva-blue), var(--canva-purple)); text-align: center; }
+        .skills { background: var(--light); color: var(--dark); }
+        .research { background: white; color: var(--dark); }
+        .career { background: #0F0F0F; }
+        .contact { background: white; color: var(--dark); }
+
+        /* Components */
+        .bento-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 1000px; }
+        .bento-item { background: white; padding: 25px; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        .res-card { flex: 1; background: var(--light); padding: 30px; border-radius: 24px; border-bottom: 6px solid var(--canva-blue); }
+        .tag { background: var(--canva-blue); color: white; padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; margin-bottom: 10px; display: inline-block; }
+        
+        /* Contact Form */
+        .contact-flex { display: flex; gap: 40px; width: 100%; max-width: 1000px; }
+        .contact-form { flex: 1; display: flex; flex-direction: column; gap: 15px; background: var(--light); padding: 30px; border-radius: 24px; }
+        .contact-form input, .contact-form textarea { padding: 12px; border: 1px solid #ddd; border-radius: 12px; }
+        .submit-btn { background: var(--canva-purple); color: white; padding: 15px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div class="deck">
+    <section class="slide hero">
+        <h1>Mohamed Elmugtaba</h1>
+        <h2 style="font-weight: 400; margin: 15px 0;">Bioinformatician | [cite_start]Pharmacist [cite: 2]</h2>
+        [cite_start]<p style="max-width: 700px; opacity: 0.9;">Accomplished professional at the intersection of clinical pharmacology and computational data science[cite: 6].</p>
+        <p style="margin-top: 20px; font-weight: bold;">Riyadh, KSA | Sudanese | [cite_start]Transferable Iqama [cite: 3]</p>
+    </section>
+
+    <section class="slide skills">
+        [cite_start]<h2 style="margin-bottom: 40px; font-size: 2.5rem; color: var(--canva-purple);">Technical Arsenal [cite: 10]</h2>
+        <div class="bento-grid">
+            [cite_start]<div class="bento-item"><h3>Code</h3><p>Python, R, Bash, Linux [cite: 11]</p></div>
+            [cite_start]<div class="bento-item"><h3>Frameworks</h3><p>Scanpy, Scarf, Nextflow [cite: 12]</p></div>
+            [cite_start]<div class="bento-item"><h3>Tools</h3><p>Jupyter, RStudio, Git [cite: 13]</p></div>
+        </div>
+    </section>
+
+    <section class="slide research">
+        [cite_start]<h2 style="margin-bottom: 40px; font-size: 2.5rem;">Bioinformatics Projects [cite: 14]</h2>
+        <div style="display: flex; gap: 20px; max-width: 1100px;">
+            <div class="res-card">
+                <span class="tag">COVID-19</span>
+                <h3>scRNA-seq Analysis</h3>
+                [cite_start]<p>Transcriptomic profiles of PBMC samples[cite: 15, 16].</p>
+            </div>
+            <div class="res-card">
+                <span class="tag">Spatial</span>
+                <h3>Integration</h3>
+                [cite_start]<p>Batch correction via Scanorama[cite: 24, 25].</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="slide career">
+        <div style="max-width: 800px; background: rgba(255,255,255,0.05); padding: 40px; border-radius: 30px; border-left: 8px solid var(--canva-blue);">
+            [cite_start]<h3 style="color: var(--canva-blue); font-size: 2rem;">4x Throughput Increase [cite: 35]</h3>
+            <h4>Production Supervisor | [cite_start]Blue Nile Factory [cite: 34]</h4>
+            [cite_start]<p style="margin-top: 15px;">Optimized production cycles and led cross-functional teams under GMP standards[cite: 35, 36, 37].</p>
+        </div>
+    </section>
+
+    <section class="slide contact">
+        <div class="contact-flex">
+            <div style="flex: 1;">
+                <span class="tag">Contact</span>
+                <h2 style="font-size: 2.5rem; color: var(--canva-purple);">Let's Collaborate</h2>
+                [cite_start]<p style="margin: 20px 0;">Available for Precision Medicine and Research opportunities in Riyadh[cite: 3, 9].</p>
+                [cite_start]<p><strong>Email:</strong> Mujtababarsi@mail.com [cite: 3]</p>
+            </div>
+            <form class="contact-form" onsubmit="event.preventDefault(); alert('Request Sent!');">
+                <input type="text" placeholder="Name" required>
+                <input type="email" placeholder="Email" required>
+                <textarea placeholder="Your Message..." rows="4" required></textarea>
+                <button type="submit" class="submit-btn">Send Inquiry</button>
+            </form>
+        </div>
+    </section>
+</div>
+
+<script>
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('active'); });
+    }, { threshold: 0.5 });
+    document.querySelectorAll('.slide').forEach(slide => observer.observe(slide));
+</script>
+</body>
+</html>
