@@ -10,9 +10,10 @@ import {
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
   AreaChart, Area 
 } from 'recharts';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useInView } from 'framer-motion'; // Added useInView
 
 // --- CONFIGURATION & CONSTANTS ---
+// FIX: Using './' ensures the image loads correctly on GitHub Pages sub-directories
 const PROFILE_IMAGE_URL = "./me.png"; 
 const apiKey = ""; 
 
@@ -195,7 +196,6 @@ async function callGemini(prompt, systemInstruction = "") {
 function SectionHeading({ title, subtitle }) {
   return (
     <div className="mb-8 text-center px-4">
-      {/* COMPACT TITLE DESIGN - Adjusted margin bottom */}
       <motion.h2 
         initial={{ opacity: 0, y: 10 }} 
         whileInView={{ opacity: 1, y: 0 }} 
@@ -364,6 +364,91 @@ function AICopilotModal({ isOpen, onClose }) {
   );
 }
 
+// --- NEW COMPONENT: Typewriter Text for Hero with Layout Stabilization & View Trigger ---
+function TypewriterText() {
+  const segments = [
+    { text: "Bioinformatics Professional & Pharmacist", bold: true },
+    { text: " bridging clinical science and computational data. I aim to redefine the frontier of discovery: using ", bold: false },
+    { text: "pharmaceutical insight", bold: true },
+    { text: " to frame the essential biological questions and ", bold: false },
+    { text: "computational innovation", bold: true },
+    { text: " to manifest the data-driven answers that make ", bold: false },
+    { text: "precision medicine a reality", bold: true },
+    { text: ".", bold: false },
+  ];
+
+  const [textState, setTextState] = useState({
+    segmentIndex: 0,
+    charIndex: 0,
+  });
+
+  const containerRef = useRef(null);
+  // Trigger when 50% of the element is visible
+  const isInView = useInView(containerRef, { amount: 0.5 });
+
+  // Reset state when out of view so it's ready to type again when scrolled into view
+  useEffect(() => {
+    if (!isInView) {
+      setTextState({ segmentIndex: 0, charIndex: 0 });
+    }
+  }, [isInView]);
+
+  // Fast typing speed (10ms)
+  useEffect(() => {
+    // Only run if visible
+    if (!isInView) return;
+    
+    if (textState.segmentIndex >= segments.length) return;
+
+    const timeout = setTimeout(() => {
+      setTextState((prev) => {
+        const currentSegment = segments[prev.segmentIndex];
+        if (prev.charIndex < currentSegment.text.length) {
+          return { ...prev, charIndex: prev.charIndex + 1 };
+        } else {
+          return { segmentIndex: prev.segmentIndex + 1, charIndex: 0 };
+        }
+      });
+    }, 10); 
+
+    return () => clearTimeout(timeout);
+  }, [textState, segments.length, isInView]);
+
+  return (
+    <div ref={containerRef} className="relative">
+      {/* GHOST ELEMENT (INVISIBLE COPY) 
+         This renders the full text invisibly to force the container 
+         to the correct height immediately, preventing layout shift.
+      */}
+      <div className="invisible pointer-events-none select-none" aria-hidden="true">
+        {segments.map((seg, i) => (
+          <span key={`ghost-${i}`} className={seg.bold ? "font-semibold" : ""}>{seg.text}</span>
+        ))}
+      </div>
+
+      {/* ANIMATED TEXT OVERLAY 
+         This sits exactly on top of the ghost element.
+      */}
+      <div className="absolute top-0 left-0 w-full h-full">
+        {segments.map((seg, i) => {
+          if (i < textState.segmentIndex) {
+            return <span key={i} className={seg.bold ? "font-semibold text-black" : ""}>{seg.text}</span>;
+          }
+          if (i === textState.segmentIndex) {
+            return (
+              <span key={i} className={seg.bold ? "font-semibold text-black" : ""}>
+                {seg.text.slice(0, textState.charIndex)}
+                <span className="animate-pulse inline-block w-0.5 h-5 bg-[#0071e3] align-middle ml-0.5"></span>
+              </span>
+            );
+          }
+          return null;
+        })}
+      </div>
+    </div>
+  );
+}
+
 function Header() {
   return (
     <header className="fixed top-0 left-0 w-full z-40 px-6 py-6 flex justify-between items-center pointer-events-none">
@@ -493,7 +578,7 @@ export default function App() {
   // Scroll Spy Logic for Active Section
   const handleScroll = (e) => {
     const container = e.target;
-    const scrollPosition = container.scrollTop + (container.clientHeight / 2); 
+    const scrollPosition = container.scrollTop + (container.clientHeight / 2); // Check middle of screen
     
     const sections = ['home', 'me', 'expertise', 'projects', 'experience', 'education'];
     
@@ -558,9 +643,10 @@ export default function App() {
               transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }} 
               className="flex flex-col items-center lg:items-start text-center lg:text-left"
             >
-              <p className="text-xl md:text-2xl text-[#1d1d1f] font-normal leading-relaxed tracking-tight max-w-lg mb-10 text-justify hyphens-auto">
-                {summaryBrief}
-              </p>
+              {/* NOTE: Changed from <p> to <div> to allow internal div structure from TypewriterText */}
+              <div className="text-xl md:text-2xl text-[#1d1d1f] font-normal leading-relaxed tracking-tight max-w-lg mb-10 text-justify hyphens-auto">
+                <TypewriterText />
+              </div>
               <div className="flex flex-wrap justify-center lg:justify-start gap-4 w-full">
                 <button 
                   onClick={() => scrollTo('me')} 
@@ -750,9 +836,9 @@ export default function App() {
         </div>
       </section>
 
-      {/* EXPERIENCE - REDESIGNED: MASTER-DETAIL TIMELINE */}
+      {/* EXPERIENCE - UPDATED SECTION */}
       <section id="experience" className="snap-start min-h-screen py-16 bg-white flex items-center justify-center">
-        <div className="max-w-6xl mx-auto px-6 w-full relative">
+        <div className="max-w-5xl mx-auto px-6 w-full relative">
           <SectionHeading title="Professional Experience" />
 
           <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-8 h-[30rem]">
