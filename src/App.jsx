@@ -3,7 +3,8 @@ import {
   Dna, Terminal, Database, Github, Mail, ExternalLink, ChevronRight, 
   Code2, Award, FlaskConical, Microscope, Cpu, Menu, X, MapPin, 
   Phone, CheckCircle2, Sparkles, Send, Loader2, BrainCircuit, 
-  Volume2, User, Cloud, Activity, FileText, Layers, Globe
+  Volume2, User, Cloud, Activity, FileText, Layers, Globe, ArrowRight,
+  Home 
 } from 'lucide-react';
 import { 
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
@@ -12,7 +13,6 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 
 // --- CONFIGURATION & CONSTANTS ---
-// FIX: Using './' ensures the image loads correctly on GitHub Pages sub-directories
 const PROFILE_IMAGE_URL = "./me.png"; 
 const apiKey = ""; 
 
@@ -22,7 +22,6 @@ const GENOMIC_DATA = [
   { pos: 600, depth: 150 }, { pos: 700, depth: 95 }, { pos: 800, depth: 30 }
 ];
 
-// Updated summary with REFINED bold styling (font-semibold instead of font-black)
 const summaryBrief = (
   <>
     <span className="font-semibold text-black">Bioinformatics Professional & Pharmacist</span> bridging clinical science and computational data. I aim to redefine the frontier of discovery: using <span className="font-semibold text-black">pharmaceutical insight</span> to frame the essential biological questions and <span className="font-semibold text-black">computational innovation</span> to manifest the data-driven answers that make <span className="font-semibold text-black">precision medicine a reality</span>.
@@ -39,17 +38,20 @@ const summaryFull = (
 
 const AREAS_OF_EXPERTISE = [
   {
-    title: "Bioinformatics",
+    title: "Genomic Data Science",
+    description: "Unraveling cellular heterogeneity through high-dimensional single-cell and spatial transcriptomics to map the fundamental architecture of disease.",
     items: ["Single-Cell RNA-seq", "NGS Workflows", "Spatial Transcriptomics", "Multi-omic Analysis"],
     icon: <Dna className="w-6 h-6" />
   },
   {
-    title: "Pharmaceutical Science",
+    title: "Precision Pharmacology",
+    description: "Bridging the gap between molecular mechanisms and therapeutic outcomes to accelerate the discovery of safer, more effective drugs.",
     items: ["Clinical Pharmacology", "Precision Medicine", "Mechanism of Action", "Drug Efficacy & Safety"],
     icon: <FlaskConical className="w-6 h-6" />
   },
   {
-    title: "Operations & Cloud",
+    title: "Digital Infrastructure",
+    description: "Architecting scalable, secure computational environments that drive digital transformation and ensure reproducibility in research.",
     items: ["Digital Transformation", "Process Optimisation", "Data Governance", "AI/ML Innovation"],
     icon: <Cloud className="w-6 h-6" />
   }
@@ -58,16 +60,19 @@ const AREAS_OF_EXPERTISE = [
 const SKILLS = [
   { 
     category: "Languages & Scripting", 
+    description: "The syntax of discovery.",
     icon: <Code2 className="w-5 h-5" />, 
     items: ["Python", "R Language", "Bash Scripting", "Linux CLI"] 
   },
   { 
     category: "Bioinformatics Tools", 
+    description: "Instruments of precision.",
     icon: <Microscope className="w-5 h-5" />, 
     items: ["Scanpy", "Scarf", "Scanorama", "Nextflow", "Zarr", "Dask"] 
   },
   { 
     category: "Data Environments", 
+    description: "Platforms for scale.",
     icon: <Database className="w-5 h-5" />, 
     items: ["Jupyter Notebook", "RStudio", "Conda", "GCP Foundations"] 
   }
@@ -189,21 +194,26 @@ async function callGemini(prompt, systemInstruction = "") {
 
 function SectionHeading({ title, subtitle }) {
   return (
-    <div className="mb-14 text-center">
+    <div className="mb-10 text-center px-4">
+      {/* COMPACT TITLE DESIGN */}
       <motion.h2 
         initial={{ opacity: 0, y: 10 }} 
         whileInView={{ opacity: 1, y: 0 }} 
         viewport={{ once: true }} 
-        className="text-4xl md:text-5xl font-semibold text-[#1d1d1f] mb-4 tracking-tight"
+        className="text-2xl md:text-3xl font-bold text-[#1d1d1f] tracking-tight"
       >
         {title}
       </motion.h2>
+      
+      {/* VISUAL ANCHOR (Pill shape) to replace massive whitespace */}
+      <div className="w-12 h-1 bg-[#0071e3]/20 mx-auto rounded-full my-4" />
+
       {subtitle && (
         <motion.p 
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
-          className="text-[#86868b] max-w-2xl mx-auto text-xl md:text-2xl font-normal leading-relaxed"
+          className="text-[#86868b] max-w-xl mx-auto text-sm md:text-base font-medium leading-relaxed"
         >
           {subtitle}
         </motion.p>
@@ -254,7 +264,7 @@ function AIProjectInsight({ project }) {
   }
 
   return (
-    <div className="mt-6 pt-5 border-t border-[#F5F5F7] w-full">
+    <div className="mt-6 pt-5 border-t border-[#F5F5F7] w-full mt-auto">
       {!insight ? (
         <button onClick={getInsight} disabled={loading} className="flex items-center gap-2 text-[12px] font-semibold text-[#0071e3] uppercase tracking-wider hover:text-[#005bb5] transition-colors group">
           {loading ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} className="group-hover:scale-110 transition-transform" />} 
@@ -355,92 +365,78 @@ function AICopilotModal({ isOpen, onClose }) {
   );
 }
 
-function Navbar({ scrollTo }) {
-  const [scrolled, setScrolled] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
+function Header() {
+  return (
+    <header className="fixed top-0 left-0 w-full z-40 px-6 py-6 flex justify-between items-center pointer-events-none">
+      <div className="pointer-events-auto flex items-center gap-2 cursor-pointer bg-white/80 backdrop-blur-md px-4 py-2 rounded-full shadow-sm ring-1 ring-black/5">
+        <Dna className="text-[#0071e3] w-5 h-5" strokeWidth={2.5} />
+        <span className="font-semibold text-[13px] tracking-wide uppercase text-[#1d1d1f]">M. Elmugtaba</span>
+      </div>
+      <a href="mailto:Mujtababarsi@mail.com" className="pointer-events-auto bg-[#1d1d1f] text-white px-5 py-2.5 rounded-full text-[12px] font-medium tracking-wide shadow-lg hover:scale-105 active:scale-95 transition-all">
+        Contact
+      </a>
+    </header>
+  );
+}
 
-  useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
+function Dock({ activeSection, scrollTo }) {
   const links = [
-    { name: 'Home', id: 'home' },
-    { name: 'Me', id: 'me' },
-    { name: 'Expertise', id: 'expertise' },
-    { name: 'Projects', id: 'projects' },
-    { name: 'Experience', id: 'experience' },
+    { id: 'home', icon: <Home size={20} />, label: 'Home' },
+    { id: 'me', icon: <User size={20} />, label: 'Bio' },
+    { id: 'expertise', icon: <Dna size={20} />, label: 'Expertise' },
+    { id: 'projects', icon: <Layers size={20} />, label: 'Projects' },
+    { id: 'experience', icon: <Terminal size={20} />, label: 'Exp' },
   ];
 
   return (
-    <nav 
-      className={`fixed w-full z-50 transition-all duration-500 ease-in-out ${
-        scrolled 
-          ? 'bg-white/70 backdrop-blur-xl saturate-180 border-b border-black/5 py-3 supports-[backdrop-filter]:bg-white/60' 
-          : 'bg-transparent py-6'
-      }`}
-    >
-      <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
-        <div 
-          className="flex items-center gap-2 cursor-pointer opacity-90 hover:opacity-100 transition-opacity" 
-          onClick={() => scrollTo('home')}
+    <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 px-4 py-3 bg-white/70 backdrop-blur-xl saturate-150 rounded-full shadow-[0_10px_40px_-10px_rgba(0,0,0,0.15)] ring-1 ring-white/50 border border-white/20">
+      {links.map((link) => (
+        <button
+          key={link.id}
+          onClick={() => scrollTo(link.id)}
+          className={`relative p-3 rounded-full transition-all duration-300 group ${
+            activeSection === link.id 
+              ? 'bg-[#0071e3] text-white shadow-md scale-110' 
+              : 'text-[#86868b] hover:bg-black/5 hover:text-[#1d1d1f]'
+          }`}
+          aria-label={link.label}
         >
-          <Dna className="text-[#0071e3] w-6 h-6" strokeWidth={2.5} />
-          <span className="font-semibold text-[14px] tracking-wide uppercase text-[#1d1d1f]">M. Elmugtaba</span>
-        </div>
-        
-        <div className="hidden md:flex items-center gap-8">
-          {links.map(l => (
-            <button 
-              key={l.id} 
-              onClick={() => scrollTo(l.id)} 
-              className="text-[#1d1d1f] hover:text-[#0071e3] text-[13px] font-medium transition-colors tracking-wide"
-            >
-              {l.name}
-            </button>
-          ))}
-          <a 
-            href="mailto:Mujtababarsi@mail.com" 
-            className="bg-[#1d1d1f] text-white px-5 py-2 rounded-full text-[12px] font-medium tracking-wide hover:bg-[#333] transition-all hover:scale-105 active:scale-95 shadow-sm"
-          >
-            Contact
-          </a>
-        </div>
-        
-        <button className="md:hidden text-[#1d1d1f]" onClick={() => setIsOpen(!isOpen)}>{isOpen ? <X size={24}/> : <Menu size={24}/>}</button>
-      </div>
-      
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div 
-            key="mobile-menu"
-            initial={{ height: 0, opacity: 0 }} 
-            animate={{ height: 'auto', opacity: 1 }} 
-            exit={{ height: 0, opacity: 0 }} 
-            className="md:hidden bg-white/95 backdrop-blur-xl border-b border-black/5 overflow-hidden"
-          >
-            <div className="flex flex-col p-6 gap-6">
-              {links.map(l => (
-                <button 
-                  key={l.id} 
-                  onClick={() => { scrollTo(l.id); setIsOpen(false); }} 
-                  className="text-left font-medium text-[#1d1d1f] text-[15px]"
-                >
-                  {l.name}
-                </button>
-              ))}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </nav>
+          {React.cloneElement(link.icon, { strokeWidth: 2 })}
+          {/* Hover Label */}
+          <span className="absolute -top-10 left-1/2 -translate-x-1/2 bg-[#1d1d1f] text-white text-[10px] font-medium px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
+            {link.label}
+          </span>
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function SectionProgress({ activeSection, scrollTo }) {
+  const sections = ['home', 'me', 'expertise', 'projects', 'experience', 'education'];
+
+  return (
+    <div className="fixed right-6 top-1/2 -translate-y-1/2 z-40 hidden lg:flex flex-col gap-4">
+      {sections.map((id) => (
+        <button
+          key={id}
+          onClick={() => scrollTo(id)}
+          className="group relative flex items-center justify-center w-3 h-3"
+        >
+          <div 
+            className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
+              activeSection === id ? 'bg-[#0071e3] scale-150' : 'bg-[#d2d2d7] group-hover:bg-[#86868b]'
+            }`} 
+          />
+        </button>
+      ))}
+    </div>
   );
 }
 
 function Footer() {
   return (
-    <footer className="py-16 bg-[#F5F5F7] border-t border-[#d2d2d7]/50 relative">
+    <footer className="py-16 bg-[#F5F5F7] border-t border-[#d2d2d7]/50 relative snap-start">
       <div className="max-w-7xl mx-auto px-6 flex flex-col items-center">
         <div className="flex items-center gap-2 mb-8 opacity-80">
           <Dna className="text-[#86868b] w-6 h-6" />
@@ -465,25 +461,71 @@ function Footer() {
 
 export default function App() {
   const [isAiOpen, setIsAiOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState('home');
+  const mainContainerRef = useRef(null);
 
-  // summaryFull is used here
-  
+  // New state for projects carousel
+  const [projectIndex, setProjectIndex] = useState(0);
+  const autoSlideRef = useRef(null);
+
+  const resetAutoSlide = () => {
+    if (autoSlideRef.current) clearInterval(autoSlideRef.current);
+    autoSlideRef.current = setInterval(() => {
+      setProjectIndex((prev) => (prev + 2) % PROJECTS.length);
+    }, 6000); // 6 seconds for each set
+  };
+
+  useEffect(() => {
+    resetAutoSlide();
+    return () => clearInterval(autoSlideRef.current);
+  }, []);
+
+  const handleManualNextProject = () => {
+    setProjectIndex((prev) => (prev + 2) % PROJECTS.length);
+    resetAutoSlide(); 
+  };
+
+  const visibleProjects = PROJECTS.slice(projectIndex, projectIndex + 2);
+
+  // Scroll Spy Logic for Active Section
+  const handleScroll = (e) => {
+    const container = e.target;
+    const scrollPosition = container.scrollTop + (container.clientHeight / 2); // Check middle of screen
+    
+    const sections = ['home', 'me', 'expertise', 'projects', 'experience', 'education'];
+    
+    for (const section of sections) {
+      const element = document.getElementById(section);
+      if (element) {
+        const { offsetTop, offsetHeight } = element;
+        if (scrollPosition >= offsetTop && scrollPosition < offsetTop + offsetHeight) {
+          setActiveSection(section);
+          break;
+        }
+      }
+    }
+  };
+
   const scrollTo = (id) => {
     const element = document.getElementById(id);
     if (element) {
-      window.scrollTo({ top: element.offsetTop - 80, behavior: 'smooth' });
+      element.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
   return (
-    <div className="min-h-screen bg-white font-sans text-[#1d1d1f] selection:bg-[#0071e3]/20 relative antialiased">
-      <Navbar scrollTo={scrollTo} />
+    <div 
+      ref={mainContainerRef}
+      onScroll={handleScroll}
+      className="h-screen w-full overflow-y-scroll snap-y snap-mandatory scroll-smooth bg-white font-sans text-[#1d1d1f] selection:bg-[#0071e3]/20 relative antialiased"
+    >
+      <Header />
+      <Dock activeSection={activeSection} scrollTo={scrollTo} />
+      <SectionProgress activeSection={activeSection} scrollTo={scrollTo} />
 
       {/* HERO Section */}
-      <section id="home" className="relative pt-32 pb-24 bg-[#F5F5F7] min-h-[90vh] flex items-center scroll-mt-24">
-        {/* Changed max-w-7xl to max-w-5xl for tighter centering */}
+      <section id="home" className="snap-start min-h-screen relative pt-20 pb-24 bg-[#F5F5F7] flex items-center justify-center">
         <div className="max-w-5xl mx-auto px-6 w-full">
-          {/* Reduced gap-20 to gap-12 to bring columns closer */}
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             
             {/* Left Side */}
@@ -496,9 +538,8 @@ export default function App() {
               <ProfilePicHolder />
               
               <div className="mt-10 flex flex-col items-center lg:items-start w-full space-y-4">
-                {/* Redesigned Name: Smaller font, bold first name, lighter last name */}
                 <h1 className="text-4xl md:text-5xl font-bold text-[#1d1d1f] tracking-tight leading-[1.1]">
-                  Mohamed <br/><span className="text-[#86868b] font-medium">Elmugtaba</span>
+                  Mohamed <span className="text-[#86868b] font-medium">Elmugtaba</span>
                 </h1>
                 
                 <p className="text-xl md:text-2xl font-medium text-[#1d1d1f] tracking-tight">
@@ -542,8 +583,8 @@ export default function App() {
       </section>
 
       {/* ME Section */}
-      <section id="me" className="py-24 bg-white scroll-mt-24">
-        <div className="max-w-7xl mx-auto px-6">
+      <section id="me" className="snap-start min-h-screen py-12 bg-white flex items-center justify-center">
+        <div className="max-w-7xl mx-auto px-6 w-full">
           <SectionHeading title="At the Intersection of Pharmacy & Bioinformatics" subtitle="Bridging clinical expertise with computational precision." />
           <div className="grid lg:grid-cols-2 gap-16 items-start">
             
@@ -602,9 +643,9 @@ export default function App() {
         </div>
       </section>
 
-      {/* AREAS OF EXPERTISE - Smart Tags Layout */}
-      <section id="expertise" className="py-24 bg-[#F5F5F7] scroll-mt-24">
-        <div className="max-w-7xl mx-auto px-6">
+      {/* AREAS OF EXPERTISE */}
+      <section id="expertise" className="snap-start min-h-screen py-12 bg-slate-50 flex items-center justify-center">
+        <div className="max-w-7xl mx-auto px-6 w-full">
           <SectionHeading title="Areas of Expertise" />
           <div className="grid md:grid-cols-3 gap-6">
             {AREAS_OF_EXPERTISE.map((area, idx) => (
@@ -620,7 +661,10 @@ export default function App() {
                   </div>
                   <h3 className="text-xl font-semibold text-[#1d1d1f]">{area.title}</h3>
                 </div>
-                <div className="flex flex-wrap gap-2 content-start">
+                <p className="text-[#86868b] text-sm leading-relaxed mb-6 font-medium">
+                  {area.description}
+                </p>
+                <div className="flex flex-wrap gap-2 content-start mt-auto">
                   {area.items.map((item, i) => (
                     <span key={i} className="px-3 py-1.5 bg-[#F5F5F7] text-[#1d1d1f] text-[13px] font-medium rounded-lg border border-black/5 hover:bg-[#E8E8ED] transition-colors cursor-default">
                       {item}
@@ -633,17 +677,20 @@ export default function App() {
         </div>
       </section>
 
-      {/* TECHNICAL SKILLS - Apple List Style */}
-      <section className="py-24 bg-white scroll-mt-24">
-        <div className="max-w-7xl mx-auto px-6">
+      {/* TECHNICAL SKILLS */}
+      <section className="snap-start min-h-screen py-12 bg-white flex items-center justify-center">
+        <div className="max-w-7xl mx-auto px-6 w-full">
           <SectionHeading title="Technical Skills" />
           <div className="grid md:grid-cols-3 gap-8">
             {SKILLS.map((skill, idx) => (
               <div key={idx} className="bg-[#F5F5F7] p-8 rounded-[2rem] h-full ring-1 ring-black/5">
-                <div className="flex items-center gap-3 mb-8">
+                <div className="flex items-center gap-3 mb-2">
                   <div className="p-2 bg-white rounded-xl text-[#0071e3] shadow-sm">{React.cloneElement(skill.icon, { strokeWidth: 2, size: 22 })}</div>
                   <h3 className="text-lg font-semibold text-[#1d1d1f]">{skill.category}</h3>
                 </div>
+                <p className="text-xs font-medium text-[#86868b] uppercase tracking-wide mb-6 ml-1">
+                  {skill.description}
+                </p>
                 <ul className="space-y-4">
                   {skill.items.map((item, i) => (
                     <li key={i} className="flex items-center gap-3 text-[#1d1d1f] font-medium text-[16px]">
@@ -658,40 +705,61 @@ export default function App() {
         </div>
       </section>
 
-      {/* PROJECTS - Large Cards */}
-      <section id="projects" className="py-24 bg-[#F5F5F7] scroll-mt-24">
-        <div className="max-w-7xl mx-auto px-6">
+      {/* PROJECTS */}
+      <section id="projects" className="snap-start min-h-screen py-24 bg-stone-50 flex items-center justify-center">
+        <div className="max-w-7xl mx-auto px-6 w-full">
           <SectionHeading title="Selected Projects" />
-          <div className="grid md:grid-cols-2 gap-8">
-            {PROJECTS.map((p, idx) => (
+          
+          <div className="relative grid grid-cols-1 min-h-[28rem]"> 
+            <AnimatePresence initial={false}>
               <motion.div 
-                key={idx} 
-                whileHover={{ scale: 1.01 }}
-                transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                className="bg-white rounded-[2.5rem] p-10 flex flex-col h-full shadow-[0_10px_30px_-10px_rgba(0,0,0,0.05)] ring-1 ring-black/5 overflow-hidden relative group"
+                key={projectIndex} 
+                className="grid md:grid-cols-2 gap-8 col-start-1 row-start-1 w-full" 
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.5, ease: "easeInOut" }}
               >
-                <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-[#0071e3] to-[#40a0ff] opacity-0 group-hover:opacity-100 transition-opacity" />
-                <h3 className="text-2xl font-semibold text-[#1d1d1f] mb-2">{p.title}</h3>
-                <div className="text-[13px] font-semibold text-[#0071e3] mb-6 uppercase tracking-wider">{p.tools}</div>
-                <p className="text-[#424245] mb-8 flex-grow text-[16px] leading-relaxed font-normal">{p.desc}</p>
-                
-                <div className="flex flex-wrap gap-2 mb-6">
-                  {p.tags.map(tag => (
-                    <span key={tag} className="px-3 py-1 bg-[#F5F5F7] text-[#1d1d1f] text-[12px] font-medium rounded-full border border-black/5">
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-                <AIProjectInsight project={p} />
+                {visibleProjects.map((p, idx) => (
+                  <div 
+                    key={p.title} 
+                    className="bg-white rounded-[2.5rem] p-10 flex flex-col h-full shadow-[0_10px_30px_-10px_rgba(0,0,0,0.05)] ring-1 ring-black/5 overflow-hidden relative group hover:scale-[1.01] transition-transform duration-300 min-h-[28rem]" 
+                  >
+                    <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-[#0071e3] to-[#40a0ff] opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <h3 className="text-2xl font-semibold text-[#1d1d1f] mb-2">{p.title}</h3>
+                    <div className="text-[13px] font-semibold text-[#0071e3] mb-6 uppercase tracking-wider">{p.tools}</div>
+                    
+                    <p className="text-[#424245] mb-8 flex-grow text-[16px] leading-relaxed font-normal line-clamp-4">
+                      {p.desc}
+                    </p>
+                    
+                    <div className="flex flex-wrap gap-2 mb-6">
+                      {p.tags.map(tag => (
+                        <span key={tag} className="px-3 py-1 bg-[#F5F5F7] text-[#1d1d1f] text-[12px] font-medium rounded-full border border-black/5">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                    <AIProjectInsight project={p} />
+                  </div>
+                ))}
               </motion.div>
-            ))}
+            </AnimatePresence>
+
+            <button 
+              onClick={handleManualNextProject}
+              className="absolute top-1/2 -right-6 md:-right-12 transform -translate-y-1/2 z-20 bg-white text-[#0071e3] p-4 rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.1)] hover:shadow-xl hover:scale-110 active:scale-95 transition-all duration-300 border border-black/5"
+              aria-label="Next Projects"
+            >
+              <ArrowRight size={24} strokeWidth={2.5} />
+            </button>
           </div>
         </div>
       </section>
 
-      {/* EXPERIENCE - Timeline Minimalist */}
-      <section id="experience" className="py-24 bg-white scroll-mt-24">
-        <div className="max-w-5xl mx-auto px-6">
+      {/* EXPERIENCE */}
+      <section id="experience" className="snap-start min-h-screen py-24 bg-white flex items-center justify-center">
+        <div className="max-w-5xl mx-auto px-6 w-full">
           <SectionHeading title="Professional Experience" />
           <div className="space-y-12 relative before:absolute before:left-[19px] before:top-4 before:bottom-4 before:w-[2px] before:bg-[#F5F5F7] md:before:hidden">
             {EXPERIENCE.map((exp, idx) => (
@@ -716,8 +784,8 @@ export default function App() {
       </section>
 
       {/* EDUCATION */}
-      <section className="py-24 bg-[#F5F5F7] scroll-mt-24">
-        <div className="max-w-4xl mx-auto px-6">
+      <section id="education" className="snap-start min-h-screen py-12 bg-blue-50/30 flex items-center justify-center">
+        <div className="max-w-4xl mx-auto px-6 w-full">
           <SectionHeading title="Education" />
           {EDUCATION_DATA.map((edu, idx) => (
             <div key={idx} className="bg-white p-12 rounded-[2.5rem] shadow-sm ring-1 ring-black/5 text-center md:text-left">
@@ -737,9 +805,9 @@ export default function App() {
         </div>
       </section>
 
-      {/* CERTIFICATIONS & PROFESSIONAL DEVELOPMENT - Leveled Up Design */}
-      <section className="py-24 bg-white scroll-mt-24 border-t border-[#F5F5F7]">
-        <div className="max-w-7xl mx-auto px-6">
+      {/* CERTIFICATIONS & PROFESSIONAL DEVELOPMENT */}
+      <section className="snap-start min-h-screen py-12 bg-white border-t border-[#F5F5F7] flex items-center justify-center">
+        <div className="max-w-7xl mx-auto px-6 w-full">
           <SectionHeading title="Certifications & Professional Development" />
           <div className="grid md:grid-cols-2 gap-16">
             {CERTIFICATES_PARTS.map((part, idx) => (
@@ -771,9 +839,9 @@ export default function App() {
         </div>
       </section>
 
-      {/* ADDITIONAL INFO - Bento Small Cards */}
-      <section className="py-24 bg-[#F5F5F7] scroll-mt-24">
-        <div className="max-w-7xl mx-auto px-6">
+      {/* ADDITIONAL INFO */}
+      <section className="snap-start min-h-screen py-12 bg-zinc-100 flex items-center justify-center">
+        <div className="max-w-7xl mx-auto px-6 w-full">
           <SectionHeading title="Details" />
           <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
              <div className="bg-white p-8 rounded-[2rem] text-center shadow-sm ring-1 ring-black/5 flex flex-col items-center justify-center h-48">
