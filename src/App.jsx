@@ -4,7 +4,7 @@ import {
   Code2, Award, FlaskConical, Microscope, Cpu, Menu, X, MapPin, 
   Phone, CheckCircle2, Sparkles, Send, Loader2, BrainCircuit, 
   Volume2, User, Cloud, Activity, FileText, Layers, Globe, ArrowRight,
-  Home 
+  Home, ChevronUp, ChevronDown, Briefcase, Calendar
 } from 'lucide-react';
 import { 
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
@@ -194,8 +194,8 @@ async function callGemini(prompt, systemInstruction = "") {
 
 function SectionHeading({ title, subtitle }) {
   return (
-    <div className="mb-10 text-center px-4">
-      {/* COMPACT TITLE DESIGN */}
+    <div className="mb-8 text-center px-4">
+      {/* COMPACT TITLE DESIGN - Adjusted margin bottom */}
       <motion.h2 
         initial={{ opacity: 0, y: 10 }} 
         whileInView={{ opacity: 1, y: 0 }} 
@@ -205,7 +205,6 @@ function SectionHeading({ title, subtitle }) {
         {title}
       </motion.h2>
       
-      {/* VISUAL ANCHOR (Pill shape) to replace massive whitespace */}
       <div className="w-12 h-1 bg-[#0071e3]/20 mx-auto rounded-full my-4" />
 
       {subtitle && (
@@ -464,15 +463,19 @@ export default function App() {
   const [activeSection, setActiveSection] = useState('home');
   const mainContainerRef = useRef(null);
 
-  // New state for projects carousel
+  // Projects State
   const [projectIndex, setProjectIndex] = useState(0);
   const autoSlideRef = useRef(null);
+  
+  // Experience State - using selection instead of scroll
+  const [selectedExpIndex, setSelectedExpIndex] = useState(0);
 
+  // --- PROJECTS LOGIC ---
   const resetAutoSlide = () => {
     if (autoSlideRef.current) clearInterval(autoSlideRef.current);
     autoSlideRef.current = setInterval(() => {
       setProjectIndex((prev) => (prev + 2) % PROJECTS.length);
-    }, 6000); // 6 seconds for each set
+    }, 6000); 
   };
 
   useEffect(() => {
@@ -484,13 +487,13 @@ export default function App() {
     setProjectIndex((prev) => (prev + 2) % PROJECTS.length);
     resetAutoSlide(); 
   };
-
+  
   const visibleProjects = PROJECTS.slice(projectIndex, projectIndex + 2);
 
   // Scroll Spy Logic for Active Section
   const handleScroll = (e) => {
     const container = e.target;
-    const scrollPosition = container.scrollTop + (container.clientHeight / 2); // Check middle of screen
+    const scrollPosition = container.scrollTop + (container.clientHeight / 2); 
     
     const sections = ['home', 'me', 'expertise', 'projects', 'experience', 'education'];
     
@@ -527,7 +530,6 @@ export default function App() {
       <section id="home" className="snap-start min-h-screen relative pt-20 pb-24 bg-[#F5F5F7] flex items-center justify-center">
         <div className="max-w-5xl mx-auto px-6 w-full">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
-            
             {/* Left Side */}
             <motion.div 
               initial={{ opacity: 0, y: 20 }} 
@@ -536,24 +538,20 @@ export default function App() {
               className="flex flex-col items-center lg:items-start text-center lg:text-left"
             >
               <ProfilePicHolder />
-              
               <div className="mt-10 flex flex-col items-center lg:items-start w-full space-y-4">
                 <h1 className="text-4xl md:text-5xl font-bold text-[#1d1d1f] tracking-tight leading-[1.1]">
                   Mohamed <span className="text-[#86868b] font-medium">Elmugtaba</span>
                 </h1>
-                
                 <p className="text-xl md:text-2xl font-medium text-[#1d1d1f] tracking-tight">
                   Bioinformatician | Pharmacist
                 </p>
-                
                 <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-full shadow-sm border border-black/5 mt-2">
                   <span className="w-2 h-2 rounded-full bg-[#34C759]" />
                   <span className="text-[12px] font-medium text-[#1d1d1f] tracking-wide">Available for projects</span>
                 </div>
               </div>
             </motion.div>
-
-            {/* Right Side - Justified Brief Content */}
+            {/* Right Side */}
             <motion.div 
               initial={{ opacity: 0, y: 30 }} 
               animate={{ opacity: 1, y: 0 }} 
@@ -563,7 +561,6 @@ export default function App() {
               <p className="text-xl md:text-2xl text-[#1d1d1f] font-normal leading-relaxed tracking-tight max-w-lg mb-10 text-justify hyphens-auto">
                 {summaryBrief}
               </p>
-              
               <div className="flex flex-wrap justify-center lg:justify-start gap-4 w-full">
                 <button 
                   onClick={() => scrollTo('me')} 
@@ -577,7 +574,6 @@ export default function App() {
                 </div>
               </div>
             </motion.div>
-
           </div>
         </div>
       </section>
@@ -587,7 +583,6 @@ export default function App() {
         <div className="max-w-7xl mx-auto px-6 w-full">
           <SectionHeading title="At the Intersection of Pharmacy & Bioinformatics" subtitle="Bridging clinical expertise with computational precision." />
           <div className="grid lg:grid-cols-2 gap-16 items-start">
-            
             <motion.div 
               initial={{ opacity: 0, y: 20 }} 
               whileInView={{ opacity: 1, y: 0 }} 
@@ -602,8 +597,6 @@ export default function App() {
                 {summaryFull}
               </p>
             </motion.div>
-
-            {/* Apple Health-style Chart Card */}
             <motion.div 
               initial={{ opacity: 0, scale: 0.95 }} 
               whileInView={{ opacity: 1, scale: 1 }} 
@@ -706,11 +699,11 @@ export default function App() {
       </section>
 
       {/* PROJECTS */}
-      <section id="projects" className="snap-start min-h-screen py-24 bg-stone-50 flex items-center justify-center">
+      <section id="projects" className="snap-start min-h-screen py-16 bg-stone-50 flex items-center justify-center">
         <div className="max-w-7xl mx-auto px-6 w-full">
           <SectionHeading title="Selected Projects" />
           
-          <div className="relative grid grid-cols-1 min-h-[28rem]"> 
+          <div className="relative grid grid-cols-1 min-h-[24rem]"> 
             <AnimatePresence initial={false}>
               <motion.div 
                 key={projectIndex} 
@@ -723,7 +716,7 @@ export default function App() {
                 {visibleProjects.map((p, idx) => (
                   <div 
                     key={p.title} 
-                    className="bg-white rounded-[2.5rem] p-10 flex flex-col h-full shadow-[0_10px_30px_-10px_rgba(0,0,0,0.05)] ring-1 ring-black/5 overflow-hidden relative group hover:scale-[1.01] transition-transform duration-300 min-h-[28rem]" 
+                    className="bg-white rounded-[2.5rem] p-8 flex flex-col h-full shadow-[0_10px_30px_-10px_rgba(0,0,0,0.05)] ring-1 ring-black/5 overflow-hidden relative group hover:scale-[1.01] transition-transform duration-300 min-h-[22rem]"
                   >
                     <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-[#0071e3] to-[#40a0ff] opacity-0 group-hover:opacity-100 transition-opacity" />
                     <h3 className="text-2xl font-semibold text-[#1d1d1f] mb-2">{p.title}</h3>
@@ -757,28 +750,76 @@ export default function App() {
         </div>
       </section>
 
-      {/* EXPERIENCE */}
-      <section id="experience" className="snap-start min-h-screen py-24 bg-white flex items-center justify-center">
-        <div className="max-w-5xl mx-auto px-6 w-full">
+      {/* EXPERIENCE - REDESIGNED: MASTER-DETAIL TIMELINE */}
+      <section id="experience" className="snap-start min-h-screen py-16 bg-white flex items-center justify-center">
+        <div className="max-w-6xl mx-auto px-6 w-full relative">
           <SectionHeading title="Professional Experience" />
-          <div className="space-y-12 relative before:absolute before:left-[19px] before:top-4 before:bottom-4 before:w-[2px] before:bg-[#F5F5F7] md:before:hidden">
-            {EXPERIENCE.map((exp, idx) => (
-              <div key={idx} className="relative pl-12 md:pl-0">
-                <div className="md:hidden absolute left-4 top-1.5 w-2 h-2 rounded-full bg-[#0071e3] ring-4 ring-white" />
-                <div className="bg-[#F5F5F7] p-8 md:p-10 rounded-[2rem] ring-1 ring-black/5 hover:bg-[#F0F0F2] transition-colors">
-                  <div className="flex flex-col md:flex-row justify-between gap-4 mb-6 md:items-center">
-                    <div>
-                      <h4 className="text-2xl font-semibold text-[#1d1d1f]">{exp.role}</h4>
-                      <p className="text-[#0071e3] font-medium text-[17px] mt-1">{exp.org}</p>
-                    </div>
-                    <span className="text-[12px] font-semibold text-[#86868b] bg-white px-4 py-1.5 rounded-full border border-black/5 w-fit">{exp.period}</span>
+
+          <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-8 h-[30rem]">
+            {/* LEFT: TIMELINE LIST */}
+            <div className="flex flex-col gap-2 overflow-y-auto pr-2 custom-scrollbar">
+              {EXPERIENCE.map((exp, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setSelectedExpIndex(idx)}
+                  className={`text-left p-4 rounded-2xl transition-all duration-300 border ${
+                    selectedExpIndex === idx 
+                      ? 'bg-[#F5F5F7] border-[#0071e3]/20 shadow-sm' 
+                      : 'bg-white border-transparent hover:bg-[#F5F5F7]'
+                  }`}
+                >
+                  <div className="flex items-center gap-3 mb-1">
+                    <div className={`w-2 h-2 rounded-full ${selectedExpIndex === idx ? 'bg-[#0071e3]' : 'bg-[#d2d2d7]'}`} />
+                    <span className={`text-xs font-bold uppercase tracking-wider ${selectedExpIndex === idx ? 'text-[#0071e3]' : 'text-[#86868b]'}`}>
+                      {exp.period}
+                    </span>
                   </div>
-                  <p className="text-[#424245] text-[16px] leading-relaxed font-normal">
-                    {exp.description}
+                  <h4 className={`text-lg font-bold ${selectedExpIndex === idx ? 'text-[#1d1d1f]' : 'text-[#424245]'}`}>
+                    {exp.role}
+                  </h4>
+                  <p className="text-sm text-[#86868b] truncate">{exp.org}</p>
+                </button>
+              ))}
+            </div>
+
+            {/* RIGHT: DETAIL CARD */}
+            <div className="relative h-full">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={selectedExpIndex}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.3 }}
+                  className="h-full bg-white/80 backdrop-blur-xl border border-black/5 rounded-[2.5rem] p-10 shadow-[0_20px_40px_-12px_rgba(0,0,0,0.1)] flex flex-col justify-center"
+                >
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="p-3 bg-[#0071e3]/10 rounded-2xl text-[#0071e3]">
+                      <Briefcase size={24} strokeWidth={1.5} />
+                    </div>
+                    <div>
+                      <h3 className="text-2xl font-bold text-[#1d1d1f]">{EXPERIENCE[selectedExpIndex].role}</h3>
+                      <p className="text-[#0071e3] font-medium text-lg">{EXPERIENCE[selectedExpIndex].org}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="w-full h-[1px] bg-black/5 mb-6" />
+                  
+                  <p className="text-lg text-[#424245] leading-relaxed">
+                    {EXPERIENCE[selectedExpIndex].description}
                   </p>
-                </div>
-              </div>
-            ))}
+
+                  <div className="mt-8 flex gap-3">
+                     <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#F5F5F7] text-[#1d1d1f] text-sm font-medium border border-black/5">
+                        <Calendar size={14} className="text-[#86868b]" /> {EXPERIENCE[selectedExpIndex].period}
+                     </span>
+                     <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#F5F5F7] text-[#1d1d1f] text-sm font-medium border border-black/5">
+                        <MapPin size={14} className="text-[#86868b]" /> Riyadh, KSA
+                     </span>
+                  </div>
+                </motion.div>
+              </AnimatePresence>
+            </div>
           </div>
         </div>
       </section>
