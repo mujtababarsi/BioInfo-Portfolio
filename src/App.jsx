@@ -12,7 +12,8 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 
 // --- CONFIGURATION & CONSTANTS ---
-const PROFILE_IMAGE_URL = "/me.png"; // Updated to PNG
+// FIX: Using './' ensures the image loads correctly on GitHub Pages sub-directories
+const PROFILE_IMAGE_URL = "./me.png"; 
 const apiKey = ""; 
 
 const GENOMIC_DATA = [
@@ -21,10 +22,10 @@ const GENOMIC_DATA = [
   { pos: 600, depth: 150 }, { pos: 700, depth: 95 }, { pos: 800, depth: 30 }
 ];
 
-// Updated summary with HEAVY bold styling
+// Updated summary with REFINED bold styling (font-semibold instead of font-black)
 const summaryBrief = (
   <>
-    <span className="font-black text-black">Bioinformatics Professional & Pharmacist</span> bridging clinical science and computational data. I aim to redefine the frontier of discovery: using <span className="font-black text-black">pharmaceutical insight</span> to frame the essential biological questions and <span className="font-black text-black">computational innovation</span> to manifest the data-driven answers that make <span className="font-black text-black">precision medicine a reality</span>.
+    <span className="font-semibold text-black">Bioinformatics Professional & Pharmacist</span> bridging clinical science and computational data. I aim to redefine the frontier of discovery: using <span className="font-semibold text-black">pharmaceutical insight</span> to frame the essential biological questions and <span className="font-semibold text-black">computational innovation</span> to manifest the data-driven answers that make <span className="font-semibold text-black">precision medicine a reality</span>.
   </>
 );
 
@@ -465,6 +466,8 @@ function Footer() {
 export default function App() {
   const [isAiOpen, setIsAiOpen] = useState(false);
 
+  // summaryFull is used here
+  
   const scrollTo = (id) => {
     const element = document.getElementById(id);
     if (element) {
@@ -478,8 +481,10 @@ export default function App() {
 
       {/* HERO Section */}
       <section id="home" className="relative pt-32 pb-24 bg-[#F5F5F7] min-h-[90vh] flex items-center scroll-mt-24">
-        <div className="max-w-7xl mx-auto px-6 w-full">
-          <div className="grid lg:grid-cols-2 gap-20 items-center">
+        {/* Changed max-w-7xl to max-w-5xl for tighter centering */}
+        <div className="max-w-5xl mx-auto px-6 w-full">
+          {/* Reduced gap-20 to gap-12 to bring columns closer */}
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
             
             {/* Left Side */}
             <motion.div 
@@ -491,8 +496,9 @@ export default function App() {
               <ProfilePicHolder />
               
               <div className="mt-10 flex flex-col items-center lg:items-start w-full space-y-4">
-                <h1 className="text-5xl md:text-7xl font-semibold text-[#1d1d1f] tracking-tight leading-[1.05]">
-                  Mohamed <br/><span className="text-[#86868b]">Elmugtaba</span>
+                {/* Redesigned Name: Smaller font, bold first name, lighter last name */}
+                <h1 className="text-4xl md:text-5xl font-bold text-[#1d1d1f] tracking-tight leading-[1.1]">
+                  Mohamed <br/><span className="text-[#86868b] font-medium">Elmugtaba</span>
                 </h1>
                 
                 <p className="text-xl md:text-2xl font-medium text-[#1d1d1f] tracking-tight">
