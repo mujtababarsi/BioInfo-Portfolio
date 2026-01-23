@@ -4,16 +4,15 @@ import {
   Code2, Award, FlaskConical, Microscope, Cpu, Menu, X, MapPin, 
   Phone, CheckCircle2, Sparkles, Send, Loader2, BrainCircuit, 
   Volume2, User, Cloud, Activity, FileText, Layers, Globe, ArrowRight,
-  Home, ChevronUp, ChevronDown, Briefcase, Calendar
+  Home, ChevronUp, ChevronDown, Briefcase, Calendar, Code, Layout, Linkedin
 } from 'lucide-react';
 import { 
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
   AreaChart, Area 
 } from 'recharts';
-import { motion, AnimatePresence, useInView } from 'framer-motion'; // Added useInView
+import { motion, AnimatePresence, useInView } from 'framer-motion';
 
 // --- CONFIGURATION & CONSTANTS ---
-// FIX: Using './' ensures the image loads correctly on GitHub Pages sub-directories
 const PROFILE_IMAGE_URL = "./me.png"; 
 const apiKey = ""; 
 
@@ -83,26 +82,35 @@ const PROJECTS = [
   {
     title: "Covid-19 Single-Cell Analysis",
     tools: "Python | Scanpy | Jupyter Notebook",
-    desc: "Conducted scRNA-seq downstream analysis on six PBMC samples to identify transcriptomic differences between COVID-19 patients and healthy controls. Engineered a comprehensive pipeline encompassing quality control, dimensionality reduction, clustering, differential expression, and cell-type prediction.",
-    tags: ["scRNA-seq", "COVID-19", "Scanpy"]
+    desc: "Conducted scRNA-seq downstream analysis on six PBMC samples to identify transcriptomic differences between COVID-19 patients and healthy controls.",
+    tags: ["scRNA-seq", "COVID-19", "Scanpy"],
+    features: ["Quality Control Pipeline", "Dimensionality Reduction", "Cell-type Prediction"],
+    // Placeholder image for glassmorphism demo (using abstract gradient if no image)
+    image: "https://images.unsplash.com/photo-1576086213369-97a306d36557?q=80&w=800&auto=format&fit=crop" 
   },
   {
-    title: "Spatial Transcriptomics & scRNA-seq Integration",
+    title: "Spatial Transcriptomics Integration",
     tools: "Python | Scanpy | Scanorama",
-    desc: "Integrated spatial datasets with single-cell RNA-seq references using the Scanorama algorithm for accurate batch correction and cell-type mapping. Developed advanced visualisations to map gene expression within original tissue architectures, successfully preserving spatial biological context.",
-    tags: ["Spatial", "Integration", "Scanorama"]
+    desc: "Integrated spatial datasets with single-cell RNA-seq references using the Scanorama algorithm for accurate batch correction and cell-type mapping.",
+    tags: ["Spatial", "Integration", "Scanorama"],
+    features: ["Batch Correction", "Tissue Mapping", "High-Performance Vis"],
+    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop"
   },
   {
-    title: "Memory-Efficient scRNA-seq Analysis (Scarf)",
+    title: "Memory-Efficient scRNA-seq (Scarf)",
     tools: "Python | Scarf | Zarr | Dask",
-    desc: "Optimised analysis for a 10x Genomics 5K PBMC dataset using the Scarf package, leveraging Zarr and Dask for low-memory data chunking. Applied KNN mapping and label transfer techniques to embed target cells onto reference manifolds.",
-    tags: ["Big Data", "Dask", "Zarr"]
+    desc: "Optimised analysis for a 10x Genomics 5K PBMC dataset using the Scarf package, leveraging Zarr and Dask for low-memory data chunking.",
+    tags: ["Big Data", "Dask", "Zarr"],
+    features: ["Low-Memory Chunking", "KNN Mapping", "Reference Projection"],
+    image: "https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?q=80&w=800&auto=format&fit=crop"
   },
   {
     title: "Data Visualisation with ggplot2",
     tools: "R | RStudio | ggplot2 | Tidyverse",
-    desc: "Generated publication-quality visualisations using the \"Grammar of Graphics\" framework to translate raw data into insightful graphical representations. Executed Exploratory Data Analysis (EDA) utilising distribution plots, correlation analysis, and complex faceted layouts.",
-    tags: ["R", "ggplot2", "EDA"]
+    desc: "Generated publication-quality visualisations using the \"Grammar of Graphics\" framework to translate raw data into insightful graphical representations.",
+    tags: ["R", "ggplot2", "EDA"],
+    features: ["Publication Quality", "Exploratory Analysis", "Complex Faceting"],
+    image: "https://images.unsplash.com/photo-1543286386-2e659306cd6c?q=80&w=800&auto=format&fit=crop"
   }
 ];
 
@@ -195,24 +203,24 @@ async function callGemini(prompt, systemInstruction = "") {
 
 function SectionHeading({ title, subtitle }) {
   return (
-    <div className="mb-8 text-center px-4">
+    <div className="mb-6 text-center px-4">
       <motion.h2 
         initial={{ opacity: 0, y: 10 }} 
         whileInView={{ opacity: 1, y: 0 }} 
         viewport={{ once: true }} 
-        className="text-2xl md:text-3xl font-bold text-[#1d1d1f] tracking-tight"
+        className="text-xl md:text-2xl font-bold text-[#1d1d1f] tracking-tight"
       >
         {title}
       </motion.h2>
       
-      <div className="w-12 h-1 bg-[#0071e3]/20 mx-auto rounded-full my-4" />
+      <div className="w-12 h-1 bg-[#0071e3]/20 mx-auto rounded-full my-3" />
 
       {subtitle && (
         <motion.p 
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
-          className="text-[#86868b] max-w-xl mx-auto text-sm md:text-base font-medium leading-relaxed"
+          className="text-[#86868b] max-w-lg mx-auto text-xs md:text-sm font-medium leading-relaxed"
         >
           {subtitle}
         </motion.p>
@@ -225,13 +233,13 @@ function ProfilePicHolder() {
   const [imgError, setImgError] = useState(false);
 
   return (
-    <div className="relative w-56 h-64 md:w-64 md:h-72 shrink-0">
+    <div className="relative w-48 h-56 md:w-56 md:h-64 shrink-0">
       <motion.div 
         whileHover={{ scale: 1.02 }}
         transition={{ type: "spring", stiffness: 300, damping: 20 }}
-        className="relative w-full h-full bg-white rounded-[2.5rem] shadow-[0_20px_40px_-12px_rgba(0,0,0,0.12)] overflow-hidden p-2 ring-1 ring-black/5"
+        className="relative w-full h-full bg-white rounded-[2rem] shadow-[0_20px_40px_-12px_rgba(0,0,0,0.12)] overflow-hidden p-2 ring-1 ring-black/5"
       >
-        <div className="w-full h-full bg-[#F5F5F7] rounded-[2rem] overflow-hidden relative">
+        <div className="w-full h-full bg-[#F5F5F7] rounded-[1.5rem] overflow-hidden relative">
           {PROFILE_IMAGE_URL && !imgError ? (
             <img 
               src={PROFILE_IMAGE_URL} 
@@ -262,16 +270,17 @@ function AIProjectInsight({ project }) {
     setLoading(false);
   }
 
+  // UPDATED: Theme-consistent colors (Blue/Gray instead of Lime) for light theme
   return (
-    <div className="mt-6 pt-5 border-t border-[#F5F5F7] w-full mt-auto">
+    <div className="mt-auto pt-4 border-t border-black/5 w-full">
       {!insight ? (
-        <button onClick={getInsight} disabled={loading} className="flex items-center gap-2 text-[12px] font-semibold text-[#0071e3] uppercase tracking-wider hover:text-[#005bb5] transition-colors group">
-          {loading ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} className="group-hover:scale-110 transition-transform" />} 
+        <button onClick={getInsight} disabled={loading} className="flex items-center gap-2 text-[10px] font-bold text-[#0071e3] uppercase tracking-widest hover:text-[#005bb5] transition-colors group">
+          {loading ? <Loader2 size={12} className="animate-spin" /> : <Sparkles size={12} className="group-hover:scale-110 transition-transform" />} 
           <span>Generate AI Insight</span>
         </button>
       ) : (
-        <motion.div initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} className="text-[15px] text-[#86868b] bg-[#F5F5F7] p-5 rounded-2xl leading-relaxed">
-          <span className="font-semibold text-[#1d1d1f] block mb-1 uppercase text-[11px] tracking-widest">AI Suggestion</span> 
+        <motion.div initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} className="text-[12px] text-[#424245] bg-[#F5F5F7] p-3 rounded-xl leading-relaxed border border-black/5 mt-2">
+          <span className="font-bold text-[#0071e3] block mb-1 uppercase text-[9px] tracking-widest">AI Suggestion</span> 
           {insight}
         </motion.div>
       )}
@@ -364,42 +373,158 @@ function AICopilotModal({ isOpen, onClose }) {
   );
 }
 
-// --- NEW COMPONENT: Typewriter Text for Hero with Layout Stabilization & View Trigger ---
+function Navbar({ scrollTo }) {
+  const [scrolled, setScrolled] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const links = [
+    { name: 'Home', id: 'home' },
+    { name: 'Me', id: 'me' },
+    { name: 'Expertise', id: 'expertise' },
+    { name: 'Projects', id: 'projects' },
+    { name: 'Experience', id: 'experience' },
+  ];
+
+  return (
+    <nav 
+      className={`fixed w-full z-50 transition-all duration-500 ease-in-out ${
+        scrolled 
+          ? 'bg-white/70 backdrop-blur-xl saturate-180 border-b border-black/5 py-3 supports-[backdrop-filter]:bg-white/60' 
+          : 'bg-transparent py-6'
+      }`}
+    >
+      <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
+        <div 
+          className="flex items-center gap-2 cursor-pointer opacity-90 hover:opacity-100 transition-opacity" 
+          onClick={() => scrollTo('home')}
+        >
+          <Dna className="text-[#0071e3] w-6 h-6" strokeWidth={2.5} />
+          <span className="font-semibold text-[14px] tracking-wide uppercase text-[#1d1d1f]">M. Elmugtaba</span>
+        </div>
+        
+        <div className="hidden md:flex items-center gap-8">
+          {links.map(l => (
+            <button 
+              key={l.id} 
+              onClick={() => scrollTo(l.id)} 
+              className="text-[#1d1d1f] hover:text-[#0071e3] text-[13px] font-medium transition-colors tracking-wide"
+            >
+              {l.name}
+            </button>
+          ))}
+          <a 
+            href="mailto:Mujtababarsi@mail.com" 
+            className="bg-[#1d1d1f] text-white px-5 py-2 rounded-full text-[12px] font-medium tracking-wide hover:bg-[#333] transition-all hover:scale-105 active:scale-95 shadow-sm"
+          >
+            Contact
+          </a>
+        </div>
+        
+        <button className="md:hidden text-[#1d1d1f]" onClick={() => setIsOpen(!isOpen)}>{isOpen ? <X size={24}/> : <Menu size={24}/>}</button>
+      </div>
+      
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div 
+            key="mobile-menu"
+            initial={{ height: 0, opacity: 0 }} 
+            animate={{ height: 'auto', opacity: 1 }} 
+            exit={{ height: 0, opacity: 0 }} 
+            className="md:hidden bg-white/95 backdrop-blur-xl border-b border-black/5 overflow-hidden"
+          >
+            <div className="flex flex-col p-6 gap-6">
+              {links.map(l => (
+                <button 
+                  key={l.id} 
+                  onClick={() => { scrollTo(l.id); setIsOpen(false); }} 
+                  className="text-left font-medium text-[#1d1d1f] text-[15px]"
+                >
+                  {l.name}
+                </button>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </nav>
+  );
+}
+
+function Footer() {
+  const currentYear = new Date().getFullYear();
+  
+  return (
+    <footer className="py-10 bg-[#F5F5F7] border-t border-[#d2d2d7]/50">
+      <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center md:items-end gap-6">
+        
+        {/* Left Side: Copyright & Location */}
+        <div className="flex flex-col gap-3 items-center md:items-start text-center md:text-left">
+           {/* Replaced Brand Icon with Copyright as requested */}
+           <p className="text-[11px] text-[#86868b] font-medium tracking-wide">
+             © {currentYear} Mohamed Elmugtaba. All rights reserved.
+           </p>
+           
+           {/* Location Icon at bottom left */}
+           <div className="flex items-center gap-1.5 opacity-80 hover:opacity-100 transition-opacity">
+             <MapPin size={14} strokeWidth={1.5} className="text-[#1d1d1f]" />
+             <span className="text-[11px] text-[#424245] font-medium">Riyadh, KSA</span>
+           </div>
+        </div>
+
+        {/* Right Side: Minimalist Icons */}
+        <div className="flex items-center gap-5">
+           <a 
+             href="https://github.com/mujtababarsi" 
+             target="_blank" 
+             rel="noreferrer"
+             className="text-[#86868b] hover:text-[#1d1d1f] transition-colors duration-300"
+             aria-label="GitHub"
+           >
+             <Github size={16} strokeWidth={1.5} />
+           </a>
+           <a 
+             href="mailto:Mujtababarsi@mail.com" 
+             className="text-[#86868b] hover:text-[#1d1d1f] transition-colors duration-300"
+             aria-label="Email"
+           >
+             <Mail size={16} strokeWidth={1.5} />
+           </a>
+        </div>
+        
+      </div>
+    </footer>
+  );
+}
+
 function TypewriterText() {
   const segments = [
-    { text: "Bioinformatics Professional & Pharmacist", bold: true },
-    { text: " bridging clinical science and computational data. I aim to redefine the frontier of discovery: using ", bold: false },
+    { text: '"Bridging ', bold: false },
+    { text: "clinical science", bold: true },
+    { text: " and ", bold: false },
+    { text: "computational data", bold: true },
+    { text: ". I aim to redefine the frontier of discovery: using ", bold: false },
     { text: "pharmaceutical insight", bold: true },
     { text: " to frame the essential biological questions and ", bold: false },
     { text: "computational innovation", bold: true },
     { text: " to manifest the data-driven answers that make ", bold: false },
-    { text: "precision medicine a reality", bold: true },
-    { text: ".", bold: false },
+    { text: "medicine a reality", bold: true },
+    { text: '."', bold: false },
   ];
 
-  const [textState, setTextState] = useState({
-    segmentIndex: 0,
-    charIndex: 0,
-  });
-
+  const [textState, setTextState] = useState({ segmentIndex: 0, charIndex: 0 });
   const containerRef = useRef(null);
-  // Trigger when 50% of the element is visible
   const isInView = useInView(containerRef, { amount: 0.5 });
 
-  // Reset state when out of view so it's ready to type again when scrolled into view
-  useEffect(() => {
-    if (!isInView) {
-      setTextState({ segmentIndex: 0, charIndex: 0 });
-    }
-  }, [isInView]);
+  useEffect(() => { if (!isInView) setTextState({ segmentIndex: 0, charIndex: 0 }); }, [isInView]);
 
-  // Fast typing speed (10ms)
   useEffect(() => {
-    // Only run if visible
-    if (!isInView) return;
-    
-    if (textState.segmentIndex >= segments.length) return;
-
+    if (!isInView || textState.segmentIndex >= segments.length) return;
     const timeout = setTimeout(() => {
       setTextState((prev) => {
         const currentSegment = segments[prev.segmentIndex];
@@ -409,39 +534,19 @@ function TypewriterText() {
           return { segmentIndex: prev.segmentIndex + 1, charIndex: 0 };
         }
       });
-    }, 10); 
-
+    }, 10);
     return () => clearTimeout(timeout);
   }, [textState, segments.length, isInView]);
 
   return (
     <div ref={containerRef} className="relative">
-      {/* GHOST ELEMENT (INVISIBLE COPY) 
-         This renders the full text invisibly to force the container 
-         to the correct height immediately, preventing layout shift.
-      */}
       <div className="invisible pointer-events-none select-none" aria-hidden="true">
-        {segments.map((seg, i) => (
-          <span key={`ghost-${i}`} className={seg.bold ? "font-semibold" : ""}>{seg.text}</span>
-        ))}
+        {segments.map((seg, i) => <span key={`ghost-${i}`} className={seg.bold ? "font-semibold" : ""}>{seg.text}</span>)}
       </div>
-
-      {/* ANIMATED TEXT OVERLAY 
-         This sits exactly on top of the ghost element.
-      */}
       <div className="absolute top-0 left-0 w-full h-full">
         {segments.map((seg, i) => {
-          if (i < textState.segmentIndex) {
-            return <span key={i} className={seg.bold ? "font-semibold text-black" : ""}>{seg.text}</span>;
-          }
-          if (i === textState.segmentIndex) {
-            return (
-              <span key={i} className={seg.bold ? "font-semibold text-black" : ""}>
-                {seg.text.slice(0, textState.charIndex)}
-                <span className="animate-pulse inline-block w-0.5 h-5 bg-[#0071e3] align-middle ml-0.5"></span>
-              </span>
-            );
-          }
+          if (i < textState.segmentIndex) return <span key={i} className={seg.bold ? "font-semibold text-black" : ""}>{seg.text}</span>;
+          if (i === textState.segmentIndex) return <span key={i} className={seg.bold ? "font-semibold text-black" : ""}>{seg.text.slice(0, textState.charIndex)}<span className="animate-pulse inline-block w-0.5 h-5 bg-[#0071e3] align-middle ml-0.5"></span></span>;
           return null;
         })}
       </div>
@@ -452,18 +557,16 @@ function TypewriterText() {
 function Header() {
   return (
     <header className="fixed top-0 left-0 w-full z-40 px-6 py-6 flex justify-between items-center pointer-events-none">
-      <div className="pointer-events-auto flex items-center gap-2 cursor-pointer bg-white/80 backdrop-blur-md px-4 py-2 rounded-full shadow-sm ring-1 ring-black/5">
+      <div className="pointer-events-auto flex items-center gap-2 cursor-pointer bg-white/80 backdrop-blur-md px-4 py-2 rounded-full shadow-sm ring-1 ring-black/5 transition-all hover:scale-105 active:scale-95">
         <Dna className="text-[#0071e3] w-5 h-5" strokeWidth={2.5} />
         <span className="font-semibold text-[13px] tracking-wide uppercase text-[#1d1d1f]">M. Elmugtaba</span>
       </div>
-      <a href="mailto:Mujtababarsi@mail.com" className="pointer-events-auto bg-[#1d1d1f] text-white px-5 py-2.5 rounded-full text-[12px] font-medium tracking-wide shadow-lg hover:scale-105 active:scale-95 transition-all">
-        Contact
-      </a>
+      <a href="mailto:Mujtababarsi@mail.com" className="pointer-events-auto bg-[#1d1d1f] text-white px-5 py-2.5 rounded-full text-[12px] font-medium tracking-wide shadow-lg hover:scale-105 active:scale-95 transition-all">Contact</a>
     </header>
   );
 }
 
-function Dock({ activeSection, scrollTo }) {
+function Dock({ activeSection, scrollTo, isVisible, setIsVisible }) {
   const links = [
     { id: 'home', icon: <Home size={20} />, label: 'Home' },
     { id: 'me', icon: <User size={20} />, label: 'Bio' },
@@ -473,71 +576,49 @@ function Dock({ activeSection, scrollTo }) {
   ];
 
   return (
-    <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 px-4 py-3 bg-white/70 backdrop-blur-xl saturate-150 rounded-full shadow-[0_10px_40px_-10px_rgba(0,0,0,0.15)] ring-1 ring-white/50 border border-white/20">
+    <motion.div 
+      initial={{ opacity: 1, y: 0, x: "-50%" }}
+      animate={{ 
+        opacity: isVisible ? 1 : 0, 
+        y: isVisible ? 0 : 20,
+        x: "-50%",
+        pointerEvents: isVisible ? 'auto' : 'none'
+      }}
+      transition={{ duration: 0.4, ease: "easeInOut" }}
+      onMouseEnter={() => setIsVisible(true)}
+      // FIXED: CENTERED with left-1/2 and motion x: "-50%" to avoid transform conflicts
+      className="fixed bottom-5 left-1/2 z-50 flex items-center gap-4 px-6 py-3 bg-white/70 backdrop-blur-xl saturate-150 rounded-full shadow-[0_10px_40px_-10px_rgba(0,0,0,0.15)] ring-1 ring-white/50 border border-white/20"
+    >
       {links.map((link) => (
         <button
           key={link.id}
           onClick={() => scrollTo(link.id)}
           className={`relative p-3 rounded-full transition-all duration-300 group ${
             activeSection === link.id 
-              ? 'bg-[#0071e3] text-white shadow-md scale-110' 
-              : 'text-[#86868b] hover:bg-black/5 hover:text-[#1d1d1f]'
+              ? 'bg-[#0071e3] text-white shadow-md scale-110' // Reverted to Blue accent
+              : 'text-[#86868b] hover:bg-black/5 hover:text-[#1d1d1f]' // Reverted to gray text
           }`}
           aria-label={link.label}
         >
-          {React.cloneElement(link.icon, { strokeWidth: 2 })}
+          {React.cloneElement(link.icon, { strokeWidth: 2.5 })}
           {/* Hover Label */}
-          <span className="absolute -top-10 left-1/2 -translate-x-1/2 bg-[#1d1d1f] text-white text-[10px] font-medium px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
-            {link.label}
-          </span>
+          <span className="absolute -top-12 left-1/2 -translate-x-1/2 bg-[#1d1d1f] text-white text-[10px] font-medium px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap shadow-lg border border-white/10">{link.label}</span>
         </button>
       ))}
-    </div>
+    </motion.div>
   );
 }
 
 function SectionProgress({ activeSection, scrollTo }) {
   const sections = ['home', 'me', 'expertise', 'projects', 'experience', 'education'];
-
   return (
     <div className="fixed right-6 top-1/2 -translate-y-1/2 z-40 hidden lg:flex flex-col gap-4">
       {sections.map((id) => (
-        <button
-          key={id}
-          onClick={() => scrollTo(id)}
-          className="group relative flex items-center justify-center w-3 h-3"
-        >
-          <div 
-            className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
-              activeSection === id ? 'bg-[#0071e3] scale-150' : 'bg-[#d2d2d7] group-hover:bg-[#86868b]'
-            }`} 
-          />
+        <button key={id} onClick={() => scrollTo(id)} className="group relative flex items-center justify-center w-3 h-3">
+          <div className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${activeSection === id ? 'bg-[#0071e3] scale-150' : 'bg-[#d2d2d7] group-hover:bg-[#86868b]'}`} />
         </button>
       ))}
     </div>
-  );
-}
-
-function Footer() {
-  return (
-    <footer className="py-16 bg-[#F5F5F7] border-t border-[#d2d2d7]/50 relative snap-start">
-      <div className="max-w-7xl mx-auto px-6 flex flex-col items-center">
-        <div className="flex items-center gap-2 mb-8 opacity-80">
-          <Dna className="text-[#86868b] w-6 h-6" />
-          <p className="text-[15px] font-semibold text-[#1d1d1f] tracking-tight">M. Elmugtaba</p>
-        </div>
-        
-        <div className="flex gap-8 mb-8">
-           <a href="https://github.com/mujtababarsi" target="_blank" className="text-[#424245] hover:text-[#1d1d1f] transition-colors text-[13px] font-medium">GitHub</a>
-           <a href="mailto:Mujtababarsi@mail.com" className="text-[#424245] hover:text-[#1d1d1f] transition-colors text-[13px] font-medium">Email</a>
-           <a href="#" className="text-[#424245] hover:text-[#1d1d1f] transition-colors text-[13px] font-medium">LinkedIn</a>
-        </div>
-        
-        <p className="text-[12px] text-[#86868b]">
-          Designed with Apple-inspired precision. Built with React & Tailwind.
-        </p>
-      </div>
-    </footer>
   );
 }
 
@@ -554,6 +635,41 @@ export default function App() {
   
   // Experience State - using selection instead of scroll
   const [selectedExpIndex, setSelectedExpIndex] = useState(0);
+
+  // Smart Toggle Logic
+  const [controlsVisible, setControlsVisible] = useState(true);
+  const scrollTimeoutRef = useRef(null);
+
+  // Helper function to handle visibility
+  const showDockTemporarily = () => {
+    setControlsVisible(true);
+    if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+    scrollTimeoutRef.current = setTimeout(() => {
+      setControlsVisible(false);
+    }, 1000);
+  };
+
+  // Add global event listeners for interactions
+  useEffect(() => {
+    const handleActivity = (e) => {
+      if (e.type === 'mousemove') {
+        showDockTemporarily();
+      } else if (e.type === 'keydown') {
+        if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space', 'PageUp', 'PageDown'].includes(e.code)) {
+          showDockTemporarily();
+        }
+      }
+    };
+
+    window.addEventListener('mousemove', handleActivity);
+    window.addEventListener('keydown', handleActivity);
+
+    return () => {
+      window.removeEventListener('mousemove', handleActivity);
+      window.removeEventListener('keydown', handleActivity);
+      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+    };
+  }, []);
 
   // --- PROJECTS LOGIC ---
   const resetAutoSlide = () => {
@@ -575,13 +691,14 @@ export default function App() {
   
   const visibleProjects = PROJECTS.slice(projectIndex, projectIndex + 2);
 
+  // --- EXPERIENCE LOGIC (INTERVAL BASED CAROUSEL) ---
+  // Re-added for continuous flow
+  
   // Scroll Spy Logic for Active Section
   const handleScroll = (e) => {
     const container = e.target;
-    const scrollPosition = container.scrollTop + (container.clientHeight / 2); // Check middle of screen
-    
+    const scrollPosition = container.scrollTop + (container.clientHeight / 2); 
     const sections = ['home', 'me', 'expertise', 'projects', 'experience', 'education'];
-    
     for (const section of sections) {
       const element = document.getElementById(section);
       if (element) {
@@ -592,6 +709,9 @@ export default function App() {
         }
       }
     }
+
+    // Trigger dock visibility on scroll
+    showDockTemporarily();
   };
 
   const scrollTo = (id) => {
@@ -608,13 +728,19 @@ export default function App() {
       className="h-screen w-full overflow-y-scroll snap-y snap-mandatory scroll-smooth bg-white font-sans text-[#1d1d1f] selection:bg-[#0071e3]/20 relative antialiased"
     >
       <Header />
-      <Dock activeSection={activeSection} scrollTo={scrollTo} />
+      <Dock 
+        activeSection={activeSection} 
+        scrollTo={scrollTo} 
+        isVisible={controlsVisible} 
+        setIsVisible={setControlsVisible} 
+      />
       <SectionProgress activeSection={activeSection} scrollTo={scrollTo} />
 
       {/* HERO Section */}
-      <section id="home" className="snap-start min-h-screen relative pt-20 pb-24 bg-[#F5F5F7] flex items-center justify-center">
+      <section id="home" className="snap-start min-h-screen relative pt-32 md:pt-40 pb-20 bg-[#F5F5F7] flex items-start justify-center">
         <div className="max-w-5xl mx-auto px-6 w-full">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+          <div className="grid lg:grid-cols-2 gap-8 items-center">
+            
             {/* Left Side */}
             <motion.div 
               initial={{ opacity: 0, y: 20 }} 
@@ -623,30 +749,34 @@ export default function App() {
               className="flex flex-col items-center lg:items-start text-center lg:text-left"
             >
               <ProfilePicHolder />
-              <div className="mt-10 flex flex-col items-center lg:items-start w-full space-y-4">
-                <h1 className="text-4xl md:text-5xl font-bold text-[#1d1d1f] tracking-tight leading-[1.1]">
-                  Mohamed <span className="text-[#86868b] font-medium">Elmugtaba</span>
+              
+              <div className="mt-6 flex flex-col items-center lg:items-start w-full space-y-3">
+                <h1 className="text-3xl md:text-4xl font-bold text-[#1d1d1f] tracking-tight leading-[1.05]">
+                  Mohamed <span className="text-[#86868b]">Elmugtaba</span>
                 </h1>
-                <p className="text-xl md:text-2xl font-medium text-[#1d1d1f] tracking-tight">
+                
+                <p className="text-lg md:text-xl font-medium text-[#1d1d1f] tracking-tight">
                   Bioinformatician | Pharmacist
                 </p>
+                
                 <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-full shadow-sm border border-black/5 mt-2">
                   <span className="w-2 h-2 rounded-full bg-[#34C759]" />
-                  <span className="text-[12px] font-medium text-[#1d1d1f] tracking-wide">Available for projects</span>
+                  <span className="text-[12px] font-medium text-[#1d1d1f] tracking-wide">Available for Collaboration</span>
                 </div>
               </div>
             </motion.div>
-            {/* Right Side */}
+
+            {/* Right Side - Justified Brief Content */}
             <motion.div 
               initial={{ opacity: 0, y: 30 }} 
               animate={{ opacity: 1, y: 0 }} 
               transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }} 
               className="flex flex-col items-center lg:items-start text-center lg:text-left"
             >
-              {/* NOTE: Changed from <p> to <div> to allow internal div structure from TypewriterText */}
-              <div className="text-xl md:text-2xl text-[#1d1d1f] font-normal leading-relaxed tracking-tight max-w-lg mb-10 text-justify hyphens-auto">
+              <div className="text-lg md:text-xl text-[#1d1d1f] font-normal leading-relaxed tracking-tight max-w-lg mb-8 text-justify hyphens-auto">
                 <TypewriterText />
               </div>
+              
               <div className="flex flex-wrap justify-center lg:justify-start gap-4 w-full">
                 <button 
                   onClick={() => scrollTo('me')} 
@@ -660,44 +790,48 @@ export default function App() {
                 </div>
               </div>
             </motion.div>
+
           </div>
         </div>
       </section>
 
       {/* ME Section */}
-      <section id="me" className="snap-start min-h-screen py-12 bg-white flex items-center justify-center">
+      <section id="me" className="snap-start min-h-screen pt-28 pb-16 bg-white flex items-start justify-center">
         <div className="max-w-7xl mx-auto px-6 w-full">
           <SectionHeading title="At the Intersection of Pharmacy & Bioinformatics" subtitle="Bridging clinical expertise with computational precision." />
-          <div className="grid lg:grid-cols-2 gap-16 items-start">
+          <div className="grid lg:grid-cols-2 gap-10 items-start">
+            
             <motion.div 
               initial={{ opacity: 0, y: 20 }} 
               whileInView={{ opacity: 1, y: 0 }} 
               viewport={{ once: true }} 
-              className="space-y-6"
+              className="space-y-5"
             >
               <div className="flex items-center gap-2 text-[#0071e3]">
                 <FileText size={22} strokeWidth={1.5} />
                 <span className="text-[12px] font-semibold uppercase tracking-widest">Bio</span>
               </div>
-              <p className="text-[19px] text-[#1d1d1f] leading-relaxed text-justify hyphens-auto font-normal">
+              <p className="text-[15px] md:text-base text-[#1d1d1f] leading-relaxed text-justify hyphens-auto font-normal">
                 {summaryFull}
               </p>
             </motion.div>
+
+            {/* Apple Health-style Chart Card */}
             <motion.div 
               initial={{ opacity: 0, scale: 0.95 }} 
               whileInView={{ opacity: 1, scale: 1 }} 
               viewport={{ once: true }} 
               transition={{ type: "spring", stiffness: 200, damping: 25 }}
-              className="bg-[#F5F5F7] p-8 rounded-[2.5rem] relative overflow-hidden ring-1 ring-black/5"
+              className="bg-[#F5F5F7] p-6 rounded-[2.5rem] relative overflow-hidden ring-1 ring-black/5"
             >
-              <div className="flex justify-between items-center mb-8">
+              <div className="flex justify-between items-center mb-6">
                 <div className="flex items-center gap-2">
                   <div className="bg-[#0071e3] p-1.5 rounded-md text-white"><Terminal size={16} /></div>
                   <span className="font-semibold text-[15px] text-[#1d1d1f]">Sequencing Depth</span>
                 </div>
                 <span className="text-[12px] font-medium text-[#86868b] uppercase tracking-wide">Real-time</span>
               </div>
-              <div className="h-64" style={{ height: 300, width: '100%' }}>
+              <div className="h-52" style={{ height: 208, width: '100%' }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={GENOMIC_DATA}>
                     <defs>
@@ -722,30 +856,41 @@ export default function App() {
         </div>
       </section>
 
-      {/* AREAS OF EXPERTISE */}
-      <section id="expertise" className="snap-start min-h-screen py-12 bg-slate-50 flex items-center justify-center">
-        <div className="max-w-7xl mx-auto px-6 w-full">
+      {/* AREAS OF EXPERTISE - ENHANCED DESIGN */}
+      <section id="expertise" className="snap-start min-h-screen pt-28 pb-16 bg-gradient-to-b from-white to-blue-50/30 flex items-start justify-center relative overflow-hidden">
+        {/* Decorative background elements */}
+        <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+           <div className="absolute top-[10%] left-[-5%] w-[400px] h-[400px] bg-blue-100/20 rounded-full blur-3xl" />
+           <div className="absolute bottom-[10%] right-[-5%] w-[400px] h-[400px] bg-indigo-100/20 rounded-full blur-3xl" />
+        </div>
+
+        <div className="max-w-7xl mx-auto px-6 w-full relative z-10">
           <SectionHeading title="Areas of Expertise" />
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-3 gap-4">
             {AREAS_OF_EXPERTISE.map((area, idx) => (
               <motion.div 
                 key={idx} 
-                whileHover={{ y: -5 }}
-                transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                className="bg-white p-6 rounded-[1.5rem] shadow-sm ring-1 ring-black/5 h-full flex flex-col"
+                whileHover={{ y: -8, boxShadow: "0 20px 40px -12px rgba(0,0,0,0.1)" }}
+                transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                className="bg-white/80 backdrop-blur-sm p-6 rounded-[2rem] border border-black/5 h-full flex flex-col relative group shadow-sm"
               >
-                <div className="flex items-center gap-3 mb-5">
-                  <div className="p-2 bg-[#F5F5F7] rounded-xl text-[#0071e3]">
-                     {React.cloneElement(area.icon, { size: 24, strokeWidth: 1.5 })}
+                {/* Icon Header */}
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 text-[#0071e3] flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-sm border border-blue-100/50">
+                     {React.cloneElement(area.icon, { size: 20, strokeWidth: 1.5 })}
                   </div>
-                  <h3 className="text-xl font-semibold text-[#1d1d1f]">{area.title}</h3>
+                  <h3 className="text-lg font-bold text-[#1d1d1f] tracking-tight">{area.title}</h3>
                 </div>
-                <p className="text-[#86868b] text-sm leading-relaxed mb-6 font-medium">
+
+                {/* Description */}
+                <p className="text-[#424245] text-[13px] leading-relaxed mb-6 font-medium">
                   {area.description}
                 </p>
-                <div className="flex flex-wrap gap-2 content-start mt-auto">
+
+                {/* Tags */}
+                <div className="flex flex-wrap gap-2 mt-auto">
                   {area.items.map((item, i) => (
-                    <span key={i} className="px-3 py-1.5 bg-[#F5F5F7] text-[#1d1d1f] text-[13px] font-medium rounded-lg border border-black/5 hover:bg-[#E8E8ED] transition-colors cursor-default">
+                    <span key={i} className="px-3 py-1 bg-[#F5F5F7] text-[#1d1d1f] text-[11px] font-semibold rounded-lg border border-black/5 group-hover:border-blue-100 hover:bg-[#0071e3] hover:text-white transition-all duration-300 cursor-default">
                       {item}
                     </span>
                   ))}
@@ -756,44 +901,70 @@ export default function App() {
         </div>
       </section>
 
-      {/* TECHNICAL SKILLS */}
-      <section className="snap-start min-h-screen py-12 bg-white flex items-center justify-center">
-        <div className="max-w-7xl mx-auto px-6 w-full">
+      {/* TECHNICAL SKILLS - ENHANCED DESIGN */}
+      <section className="snap-start min-h-screen pt-28 pb-16 bg-white flex items-start justify-center relative">
+         {/* Subtle technical grid background pattern */}
+         <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none" />
+
+        <div className="max-w-7xl mx-auto px-6 w-full relative z-10">
           <SectionHeading title="Technical Skills" />
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-3 gap-6">
             {SKILLS.map((skill, idx) => (
-              <div key={idx} className="bg-[#F5F5F7] p-8 rounded-[2rem] h-full ring-1 ring-black/5">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="p-2 bg-white rounded-xl text-[#0071e3] shadow-sm">{React.cloneElement(skill.icon, { strokeWidth: 2, size: 22 })}</div>
-                  <h3 className="text-lg font-semibold text-[#1d1d1f]">{skill.category}</h3>
+              <motion.div 
+                key={idx} 
+                whileHover={{ y: -5 }}
+                className="bg-[#F5F5F7]/80 backdrop-blur-xl p-6 rounded-[2.5rem] h-full ring-1 ring-black/5 hover:ring-black/10 transition-all duration-300 relative overflow-hidden group"
+              >
+                {/* Decorative Corner Gradient */}
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-white/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-bl-[3rem] pointer-events-none" />
+
+                <div className="flex items-center gap-4 mb-6 relative z-10">
+                  <div className="w-10 h-10 bg-white rounded-2xl text-[#0071e3] shadow-sm flex items-center justify-center ring-1 ring-black/5 group-hover:scale-105 transition-transform duration-300">
+                    {React.cloneElement(skill.icon, { strokeWidth: 1.5, size: 20 })}
+                  </div>
+                  <h3 className="text-lg font-bold text-[#1d1d1f] tracking-tight">{skill.category}</h3>
                 </div>
-                <p className="text-xs font-medium text-[#86868b] uppercase tracking-wide mb-6 ml-1">
-                  {skill.description}
-                </p>
-                <ul className="space-y-4">
+
+                <div className="space-y-3 relative z-10">
                   {skill.items.map((item, i) => (
-                    <li key={i} className="flex items-center gap-3 text-[#1d1d1f] font-medium text-[16px]">
-                      <CheckCircle2 size={18} className="text-[#0071e3] flex-shrink-0" strokeWidth={2.5} /> 
-                      {item}
-                    </li>
+                    <motion.div 
+                      key={i}
+                      initial={{ opacity: 0, x: -10 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      transition={{ delay: idx * 0.1 + i * 0.05 }}
+                      className="flex items-center gap-3 group/item"
+                    >
+                      <div className="w-5 h-5 rounded-full bg-white flex items-center justify-center shadow-sm text-[#0071e3] group-hover/item:scale-110 transition-transform ring-1 ring-black/5">
+                        <CheckCircle2 size={10} strokeWidth={3} /> 
+                      </div>
+                      <span className="text-[#1d1d1f] font-medium text-[14px] group-hover/item:text-[#0071e3] transition-colors">
+                        {item}
+                      </span>
+                    </motion.div>
                   ))}
-                </ul>
-              </div>
+                </div>
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* PROJECTS */}
-      <section id="projects" className="snap-start min-h-screen py-16 bg-stone-50 flex items-center justify-center">
-        <div className="max-w-7xl mx-auto px-6 w-full">
-          <SectionHeading title="Selected Projects" />
+      {/* PROJECTS: RESTORED TO LIGHT THEME - ENHANCED */}
+      <section id="projects" className="snap-start min-h-screen pt-12 pb-12 bg-[#F5F5F7] flex items-start justify-center relative overflow-hidden">
+        {/* Subtle Decorative Background Blob */}
+        <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] bg-blue-100/30 rounded-full blur-3xl opacity-50 pointer-events-none" />
+        
+        <div className="max-w-4xl mx-auto px-6 w-full relative z-10">
+          <div className="mb-8 text-center px-4">
+             <h2 className="text-xl md:text-2xl font-bold text-[#1d1d1f] tracking-tight">Selected Projects</h2>
+             <div className="w-12 h-1 bg-[#0071e3]/20 mx-auto rounded-full my-3" />
+          </div>
           
-          <div className="relative grid grid-cols-1 min-h-[24rem]"> 
+          <div className="relative grid grid-cols-1 min-h-[22rem]"> 
             <AnimatePresence initial={false}>
               <motion.div 
                 key={projectIndex} 
-                className="grid md:grid-cols-2 gap-8 col-start-1 row-start-1 w-full" 
+                className="grid grid-cols-2 gap-6 col-start-1 row-start-1 w-full" 
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
@@ -802,68 +973,96 @@ export default function App() {
                 {visibleProjects.map((p, idx) => (
                   <div 
                     key={p.title} 
-                    className="bg-white rounded-[2.5rem] p-8 flex flex-col h-full shadow-[0_10px_30px_-10px_rgba(0,0,0,0.05)] ring-1 ring-black/5 overflow-hidden relative group hover:scale-[1.01] transition-transform duration-300 min-h-[22rem]"
+                    className="bg-white/80 backdrop-blur-md rounded-[2rem] border border-white/60 p-5 flex flex-col h-full hover:shadow-xl hover:shadow-blue-500/5 transition-all duration-500 group ring-1 ring-black/5"
                   >
-                    <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-[#0071e3] to-[#40a0ff] opacity-0 group-hover:opacity-100 transition-opacity" />
-                    <h3 className="text-2xl font-semibold text-[#1d1d1f] mb-2">{p.title}</h3>
-                    <div className="text-[13px] font-semibold text-[#0071e3] mb-6 uppercase tracking-wider">{p.tools}</div>
-                    
-                    <p className="text-[#424245] mb-8 flex-grow text-[16px] leading-relaxed font-normal line-clamp-4">
-                      {p.desc}
-                    </p>
-                    
-                    <div className="flex flex-wrap gap-2 mb-6">
-                      {p.tags.map(tag => (
-                        <span key={tag} className="px-3 py-1 bg-[#F5F5F7] text-[#1d1d1f] text-[12px] font-medium rounded-full border border-black/5">
-                          {tag}
-                        </span>
-                      ))}
+                    {/* Compact Image */}
+                    <div className="h-36 w-full rounded-xl overflow-hidden mb-4 border border-black/5 bg-gray-50 relative group-hover:scale-[1.02] transition-transform duration-500">
+                       <div className={`w-full h-full transform transition-transform duration-500 group-hover:scale-110 flex items-center justify-center text-[#86868b]`}>
+                          {p.image ? <img src={p.image} alt={p.title} className="w-full h-full object-cover" /> : <Globe size={48} />}
+                       </div>
+                       {/* Subtle overlay on hover */}
+                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-500" />
                     </div>
-                    <AIProjectInsight project={p} />
+
+                    <div className="flex flex-col flex-grow">
+                        <div className="flex justify-between items-start mb-2">
+                             <h3 className="text-base font-bold text-[#1d1d1f] leading-tight group-hover:text-[#0071e3] transition-colors">{p.title}</h3>
+                             <div className="bg-[#0071e3]/10 p-1.5 rounded-lg text-[#0071e3]">
+                                <Code size={14} />
+                             </div>
+                        </div>
+
+                        <p className="text-[#0071e3] text-[10px] font-bold uppercase tracking-wide mb-3">{p.tools}</p>
+                        
+                        <p className="text-[#424245] text-[12px] leading-relaxed line-clamp-3 mb-4 flex-grow font-medium">
+                          {p.desc}
+                        </p>
+                        
+                        {/* Features List (Compact) */}
+                        {p.features && (
+                            <ul className="mb-4 space-y-1.5">
+                                {p.features.slice(0,2).map((feat, i) => (
+                                    <li key={i} className="flex items-center gap-2 text-[10px] text-[#424245]/80 font-medium">
+                                        <div className="w-1 h-1 rounded-full bg-[#0071e3]" /> {feat}
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+
+                        <div className="flex gap-2 mt-auto">
+                            <button className="flex-1 bg-[#0071e3] hover:bg-[#005bb5] text-white text-[11px] font-bold py-2.5 rounded-xl transition-all shadow-md shadow-blue-500/20 hover:shadow-blue-500/40 flex items-center justify-center gap-1 active:scale-95">
+                                View Project <ArrowRight size={12} />
+                            </button>
+                             <button className="px-3 bg-white hover:bg-gray-50 text-[#1d1d1f] rounded-xl border border-black/10 transition-colors shadow-sm hover:shadow-md">
+                                <Github size={14} />
+                            </button>
+                        </div>
+                    </div>
                   </div>
                 ))}
               </motion.div>
             </AnimatePresence>
 
+            {/* Floating Navigation Button (Blue Accent) */}
             <button 
               onClick={handleManualNextProject}
-              className="absolute top-1/2 -right-6 md:-right-12 transform -translate-y-1/2 z-20 bg-white text-[#0071e3] p-4 rounded-full shadow-[0_4px_20px_rgba(0,0,0,0.1)] hover:shadow-xl hover:scale-110 active:scale-95 transition-all duration-300 border border-black/5"
+              className="absolute top-1/2 -right-10 md:-right-14 transform -translate-y-1/2 z-20 bg-white text-[#0071e3] p-3 rounded-full shadow-lg border border-black/5 transition-all hover:scale-110 active:scale-95"
               aria-label="Next Projects"
             >
-              <ArrowRight size={24} strokeWidth={2.5} />
+              <ArrowRight size={20} strokeWidth={2.5} />
             </button>
           </div>
         </div>
       </section>
 
-      {/* EXPERIENCE - UPDATED SECTION */}
-      <section id="experience" className="snap-start min-h-screen py-16 bg-white flex items-center justify-center">
-        <div className="max-w-5xl mx-auto px-6 w-full relative">
+      {/* EXPERIENCE - ENHANCED VISUALS */}
+      <section id="experience" className="snap-start min-h-screen pt-20 pb-16 bg-white flex items-start justify-center relative">
+        <div className="max-w-6xl mx-auto px-6 w-full relative z-10">
           <SectionHeading title="Professional Experience" />
 
-          <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-8 h-[30rem]">
+          <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-8 h-[26rem]">
             {/* LEFT: TIMELINE LIST */}
-            <div className="flex flex-col gap-2 overflow-y-auto pr-2 custom-scrollbar">
+            <div className="flex flex-col gap-3 overflow-y-auto pr-2 custom-scrollbar">
               {EXPERIENCE.map((exp, idx) => (
                 <button
                   key={idx}
                   onClick={() => setSelectedExpIndex(idx)}
-                  className={`text-left p-4 rounded-2xl transition-all duration-300 border ${
+                  className={`text-left p-4 rounded-[1.5rem] transition-all duration-300 border group ${
                     selectedExpIndex === idx 
-                      ? 'bg-[#F5F5F7] border-[#0071e3]/20 shadow-sm' 
-                      : 'bg-white border-transparent hover:bg-[#F5F5F7]'
+                      ? 'bg-[#F5F5F7] border-[#0071e3]/20 shadow-inner' 
+                      : 'bg-white border-transparent hover:bg-gray-50'
                   }`}
                 >
-                  <div className="flex items-center gap-3 mb-1">
-                    <div className={`w-2 h-2 rounded-full ${selectedExpIndex === idx ? 'bg-[#0071e3]' : 'bg-[#d2d2d7]'}`} />
-                    <span className={`text-xs font-bold uppercase tracking-wider ${selectedExpIndex === idx ? 'text-[#0071e3]' : 'text-[#86868b]'}`}>
+                  <div className="flex items-center gap-3 mb-1.5">
+                    <div className={`w-2 h-2 rounded-full transition-colors ${selectedExpIndex === idx ? 'bg-[#0071e3] ring-4 ring-[#0071e3]/20' : 'bg-[#d2d2d7] group-hover:bg-[#86868b]'}`} />
+                    <span className={`text-[10px] font-bold uppercase tracking-wider ${selectedExpIndex === idx ? 'text-[#0071e3]' : 'text-[#86868b]'}`}>
                       {exp.period}
                     </span>
                   </div>
-                  <h4 className={`text-lg font-bold ${selectedExpIndex === idx ? 'text-[#1d1d1f]' : 'text-[#424245]'}`}>
+                  <h4 className={`text-[15px] font-bold ${selectedExpIndex === idx ? 'text-[#1d1d1f]' : 'text-[#424245]'}`}>
                     {exp.role}
                   </h4>
-                  <p className="text-sm text-[#86868b] truncate">{exp.org}</p>
+                  <p className="text-[11px] text-[#86868b] truncate font-medium">{exp.org}</p>
                 </button>
               ))}
             </div>
@@ -877,30 +1076,35 @@ export default function App() {
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
                   transition={{ duration: 0.3 }}
-                  className="h-full bg-white/80 backdrop-blur-xl border border-black/5 rounded-[2.5rem] p-10 shadow-[0_20px_40px_-12px_rgba(0,0,0,0.1)] flex flex-col justify-center"
+                  className="h-full bg-gradient-to-br from-[#F9F9FB] to-white border border-black/5 rounded-[2.5rem] p-8 shadow-[0_20px_40px_-12px_rgba(0,0,0,0.08)] flex flex-col justify-center relative overflow-hidden"
                 >
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="p-3 bg-[#0071e3]/10 rounded-2xl text-[#0071e3]">
+                  {/* Decorative Background Icon */}
+                  <div className="absolute -bottom-10 -right-10 text-gray-50 opacity-50 transform rotate-12 pointer-events-none">
+                      <Briefcase size={200} strokeWidth={0.5} />
+                  </div>
+
+                  <div className="flex items-center gap-4 mb-6 relative z-10">
+                    <div className="p-3.5 bg-white rounded-2xl text-[#0071e3] shadow-sm border border-black/5">
                       <Briefcase size={24} strokeWidth={1.5} />
                     </div>
                     <div>
-                      <h3 className="text-2xl font-bold text-[#1d1d1f]">{EXPERIENCE[selectedExpIndex].role}</h3>
-                      <p className="text-[#0071e3] font-medium text-lg">{EXPERIENCE[selectedExpIndex].org}</p>
+                      <h3 className="text-2xl font-bold text-[#1d1d1f] tracking-tight">{EXPERIENCE[selectedExpIndex].role}</h3>
+                      <p className="text-[#0071e3] font-semibold text-base">{EXPERIENCE[selectedExpIndex].org}</p>
                     </div>
                   </div>
                   
-                  <div className="w-full h-[1px] bg-black/5 mb-6" />
+                  <div className="w-full h-[1px] bg-gradient-to-r from-black/5 to-transparent mb-6 relative z-10" />
                   
-                  <p className="text-lg text-[#424245] leading-relaxed">
+                  <p className="text-[15px] text-[#424245] leading-relaxed font-medium relative z-10">
                     {EXPERIENCE[selectedExpIndex].description}
                   </p>
 
-                  <div className="mt-8 flex gap-3">
-                     <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#F5F5F7] text-[#1d1d1f] text-sm font-medium border border-black/5">
+                  <div className="mt-8 flex gap-3 relative z-10">
+                     <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white text-[#1d1d1f] text-xs font-semibold border border-black/5 shadow-sm">
                         <Calendar size={14} className="text-[#86868b]" /> {EXPERIENCE[selectedExpIndex].period}
                      </span>
-                     <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#F5F5F7] text-[#1d1d1f] text-sm font-medium border border-black/5">
-                        <MapPin size={14} className="text-[#86868b]" /> Riyadh, KSA
+                     <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white text-[#1d1d1f] text-xs font-semibold border border-black/5 shadow-sm">
+                        <MapPin size={14} className="text-[#86868b]" /> Khartoum, Sudan
                      </span>
                   </div>
                 </motion.div>
@@ -910,38 +1114,45 @@ export default function App() {
         </div>
       </section>
 
-      {/* EDUCATION */}
-      <section id="education" className="snap-start min-h-screen py-12 bg-blue-50/30 flex items-center justify-center">
+      {/* EDUCATION - ENHANCED CARD */}
+      <section id="education" className="snap-start min-h-screen pt-28 pb-16 bg-gradient-to-tr from-blue-50/50 via-white to-blue-50/50 flex items-start justify-center">
         <div className="max-w-4xl mx-auto px-6 w-full">
           <SectionHeading title="Education" />
           {EDUCATION_DATA.map((edu, idx) => (
-            <div key={idx} className="bg-white p-12 rounded-[2.5rem] shadow-sm ring-1 ring-black/5 text-center md:text-left">
-              <div className="flex flex-col md:flex-row justify-between mb-8 items-center md:items-start gap-4">
+            <div key={idx} className="bg-white/80 backdrop-blur-xl p-10 rounded-[3rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.05)] border border-white/50 text-center md:text-left relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-blue-50/50 to-transparent rounded-bl-full pointer-events-none" />
+              
+              <div className="flex flex-col md:flex-row justify-between mb-8 items-center md:items-start gap-4 relative z-10">
                 <div>
-                  <h3 className="text-2xl font-semibold text-[#1d1d1f]">{edu.degree}</h3>
-                  <p className="text-[#0071e3] font-medium mt-1">{edu.school} | {edu.location}</p>
+                  <h3 className="text-2xl font-bold text-[#1d1d1f] tracking-tight">{edu.degree}</h3>
+                  <p className="text-[#0071e3] font-semibold mt-1.5 text-lg">{edu.school} | {edu.location}</p>
                 </div>
-                <span className="text-sm font-medium text-[#86868b] bg-[#F5F5F7] px-4 py-1.5 rounded-full">{edu.period}</span>
+                <span className="text-xs font-bold text-[#86868b] bg-[#F5F5F7] px-5 py-2 rounded-full border border-black/5 tracking-wide">{edu.period}</span>
               </div>
-              <div className="pt-8 border-t border-[#F5F5F7]">
-                <p className="text-[13px] font-semibold text-[#86868b] uppercase tracking-widest mb-4">Core Curriculum</p>
-                <p className="text-[#1d1d1f] leading-relaxed text-[16px]">{edu.details}</p>
+              <div className="pt-8 border-t border-black/5 relative z-10">
+                <p className="text-[11px] font-bold text-[#86868b] uppercase tracking-widest mb-4 flex items-center gap-2">
+                    <span className="w-1 h-4 bg-[#0071e3] rounded-full" />
+                    Core Curriculum
+                </p>
+                <p className="text-[#1d1d1f] leading-relaxed text-[15px] font-medium">{edu.details}</p>
               </div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* CERTIFICATIONS & PROFESSIONAL DEVELOPMENT */}
-      <section className="snap-start min-h-screen py-12 bg-white border-t border-[#F5F5F7] flex items-center justify-center">
+      {/* CERTIFICATIONS & PROFESSIONAL DEVELOPMENT - ENHANCED CARDS */}
+      <section className="snap-start min-h-screen pt-20 pb-16 bg-white border-t border-[#F5F5F7] flex items-start justify-center">
         <div className="max-w-7xl mx-auto px-6 w-full">
           <SectionHeading title="Certifications & Professional Development" />
-          <div className="grid md:grid-cols-2 gap-16">
+          <div className="grid md:grid-cols-2 gap-12">
             {CERTIFICATES_PARTS.map((part, idx) => (
               <div key={idx} className="flex flex-col">
-                <div className="mb-6 pb-4 border-b border-[#F5F5F7]">
-                  <h3 className="text-xl font-semibold text-[#1d1d1f] tracking-tight flex items-center gap-2">
-                    {idx === 0 ? <Cpu size={22} className="text-[#0071e3]" /> : <Award size={22} className="text-[#0071e3]" />}
+                <div className="mb-6 pb-4 border-b border-[#F5F5F7] flex items-center gap-3">
+                  <div className="p-2 bg-blue-50 rounded-lg text-[#0071e3]">
+                    {idx === 0 ? <Cpu size={20} /> : <Award size={20} />}
+                  </div>
+                  <h3 className="text-xl font-bold text-[#1d1d1f] tracking-tight">
                     {part.title}
                   </h3>
                 </div>
@@ -949,12 +1160,12 @@ export default function App() {
                   {part.items.map((cert, i) => (
                     <motion.div 
                       key={i} 
-                      whileHover={{ x: 4, backgroundColor: "#F5F5F7" }} 
+                      whileHover={{ x: 6, backgroundColor: "#F9FAFB", borderColor: "#E5E7EB" }} 
                       transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                      className="group p-4 rounded-2xl border border-[#F5F5F7] flex items-start gap-4 transition-all duration-300 cursor-default"
+                      className="group p-4 rounded-2xl border border-transparent hover:border-gray-200 bg-white hover:shadow-sm transition-all duration-300 cursor-default flex items-start gap-4"
                     >
-                      <div className="mt-1.5 w-2 h-2 rounded-full bg-[#d2d2d7] group-hover:bg-[#0071e3] transition-colors shrink-0" />
-                      <p className="text-[16px] font-medium text-[#424245] group-hover:text-[#1d1d1f] leading-snug transition-colors">
+                      <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-gray-300 group-hover:bg-[#0071e3] group-hover:scale-125 transition-all shrink-0" />
+                      <p className="text-[15px] font-medium text-[#424245] group-hover:text-[#1d1d1f] leading-snug transition-colors">
                         {cert}
                       </p>
                     </motion.div>
@@ -966,26 +1177,104 @@ export default function App() {
         </div>
       </section>
 
-      {/* ADDITIONAL INFO */}
-      <section className="snap-start min-h-screen py-12 bg-zinc-100 flex items-center justify-center">
-        <div className="max-w-7xl mx-auto px-6 w-full">
-          <SectionHeading title="Details" />
-          <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-             <div className="bg-white p-8 rounded-[2rem] text-center shadow-sm ring-1 ring-black/5 flex flex-col items-center justify-center h-48">
-                <Globe className="text-[#0071e3] mb-4" size={32} strokeWidth={1.5} />
-                <h4 className="font-semibold text-[13px] text-[#86868b] uppercase tracking-widest mb-2">Languages</h4>
-                <p className="text-[#1d1d1f] font-medium text-xl">{ADDITIONAL_INFO.languages}</p>
-             </div>
-             <div className="bg-white p-8 rounded-[2rem] text-center shadow-sm ring-1 ring-black/5 flex flex-col items-center justify-center h-48">
-                <MapPin className="text-[#0071e3] mb-4" size={32} strokeWidth={1.5} />
-                <h4 className="font-semibold text-[13px] text-[#86868b] uppercase tracking-widest mb-2">Location</h4>
-                <p className="text-[#1d1d1f] font-medium text-xl">{ADDITIONAL_INFO.location}</p>
-             </div>
-             <div className="bg-white p-8 rounded-[2rem] text-center shadow-sm ring-1 ring-black/5 flex flex-col items-center justify-center h-48">
-                <Activity className="text-[#0071e3] mb-4" size={32} strokeWidth={1.5} />
-                <h4 className="font-semibold text-[13px] text-[#86868b] uppercase tracking-widest mb-2">Visa Status</h4>
-                <p className="text-[#1d1d1f] font-medium text-[15px] leading-tight max-w-[180px]">{ADDITIONAL_INFO.visa}</p>
-             </div>
+      {/* ADDITIONAL INFO - VISUALLY ENHANCED BENTO LAYOUT */}
+      <section className="snap-start min-h-screen pt-28 pb-24 bg-gradient-to-br from-slate-50 to-gray-100 flex items-start justify-center relative overflow-hidden">
+        {/* Subtle Background Elements */}
+        <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+             <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-blue-100/40 rounded-full blur-3xl opacity-60" />
+             <div className="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-indigo-50/40 rounded-full blur-3xl opacity-60" />
+        </div>
+
+        <div className="max-w-5xl mx-auto px-6 w-full relative z-10">
+          <SectionHeading title="Personal Details" />
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            
+            {/* Card 1: Identity & Connect */}
+            <motion.div 
+              whileHover={{ y: -8 }}
+              transition={{ type: "spring", stiffness: 300, damping: 20 }}
+              className="md:col-span-1 bg-white/80 backdrop-blur-xl rounded-[2.5rem] p-6 flex flex-col items-center justify-center text-center shadow-[0_20px_40px_-12px_rgba(0,0,0,0.05)] border border-white/60 relative overflow-hidden group ring-1 ring-black/5"
+            >
+                <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-b from-[#0071e3]/5 to-transparent transition-opacity duration-500 group-hover:opacity-80" />
+                
+                <div className="relative w-24 h-24 rounded-full overflow-hidden ring-4 ring-white shadow-xl mb-6 group-hover:scale-105 transition-transform duration-500">
+                    <img src={PROFILE_IMAGE_URL} alt="Profile" className="w-full h-full object-cover" />
+                </div>
+                
+                <h3 className="text-lg font-bold text-[#1d1d1f] tracking-tight">M. Elmugtaba</h3>
+                <p className="text-xs font-medium text-[#0071e3] mt-1 mb-6">Bioinformatician & Pharmacist</p>
+                
+                <div className="flex gap-3 w-full justify-center relative z-10">
+                   <a href="mailto:Mujtababarsi@mail.com" className="p-3 rounded-full bg-white text-[#1d1d1f] hover:bg-[#0071e3] hover:text-white transition-all duration-300 shadow-sm border border-black/5">
+                     <Mail size={18} strokeWidth={2} />
+                   </a>
+                   <a href="https://github.com/mujtababarsi" target="_blank" className="p-3 rounded-full bg-white text-[#1d1d1f] hover:bg-[#0071e3] hover:text-white transition-all duration-300 shadow-sm border border-black/5">
+                     <Github size={18} strokeWidth={2} />
+                   </a>
+                </div>
+            </motion.div>
+
+            {/* Card 2: Details Grid */}
+            <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
+                
+                {/* Location */}
+                <motion.div 
+                  whileHover={{ y: -5 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                  className="bg-white/80 backdrop-blur-xl rounded-[2.5rem] p-6 flex flex-col justify-between shadow-[0_20px_40px_-12px_rgba(0,0,0,0.05)] border border-white/60 ring-1 ring-black/5 group"
+                >
+                    <div className="w-10 h-10 rounded-2xl bg-blue-50 text-[#0071e3] flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                        <MapPin size={20} strokeWidth={2} />
+                    </div>
+                    <div>
+                        <span className="text-[10px] font-bold text-[#86868b] uppercase tracking-widest">Location</span>
+                        <p className="text-lg font-bold text-[#1d1d1f] mt-1 tracking-tight">{ADDITIONAL_INFO.location}</p>
+                        <p className="text-[12px] text-[#86868b] font-medium mt-1">Open to Relocation</p>
+                    </div>
+                </motion.div>
+
+                {/* Languages */}
+                <motion.div 
+                  whileHover={{ y: -5 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                  className="bg-white/80 backdrop-blur-xl rounded-[2.5rem] p-6 flex flex-col justify-between shadow-[0_20px_40px_-12px_rgba(0,0,0,0.05)] border border-white/60 ring-1 ring-black/5 group"
+                >
+                     <div className="w-10 h-10 rounded-2xl bg-indigo-50 text-indigo-500 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                        <Globe size={20} strokeWidth={2} />
+                    </div>
+                    <div>
+                        <span className="text-[10px] font-bold text-[#86868b] uppercase tracking-widest">Languages</span>
+                        <p className="text-lg font-bold text-[#1d1d1f] mt-1 tracking-tight">{ADDITIONAL_INFO.languages}</p>
+                        <p className="text-[12px] text-[#86868b] font-medium mt-1">Native & Professional</p>
+                    </div>
+                </motion.div>
+
+                {/* Status/Visa - Wide Card */}
+                <motion.div 
+                   whileHover={{ y: -5 }}
+                   transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                   className="sm:col-span-2 bg-white/80 backdrop-blur-xl rounded-[2.5rem] p-6 flex flex-col sm:flex-row sm:items-center gap-6 sm:gap-8 shadow-[0_20px_40px_-12px_rgba(0,0,0,0.05)] border border-white/60 ring-1 ring-black/5 group"
+                >
+                     <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex-shrink-0 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                        <Activity size={24} strokeWidth={2} />
+                    </div>
+                    <div>
+                        <span className="text-[10px] font-bold text-[#86868b] uppercase tracking-widest">Professional Status</span>
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:gap-8 mt-2">
+                            <div className="flex items-center gap-3">
+                              <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.4)]" />
+                              <p className="text-[14px] font-semibold text-[#1d1d1f]">Transferable Iqama</p>
+                            </div>
+                            <div className="hidden sm:block w-px h-5 bg-black/10" />
+                            <div className="flex items-center gap-3">
+                              <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.4)]" />
+                              <p className="text-[14px] font-semibold text-[#1d1d1f]">Valid Driver License</p>
+                            </div>
+                        </div>
+                    </div>
+                </motion.div>
+            </div>
           </div>
         </div>
       </section>
@@ -993,13 +1282,21 @@ export default function App() {
       <Footer />
 
       {/* Floating Action Button - Apple Style */}
-      <button 
+      <motion.button 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ 
+          opacity: 1, 
+          y: 0,
+          pointerEvents: 'auto'
+        }}
+        transition={{ duration: 0.4, ease: "easeInOut" }}
+        onMouseEnter={() => setControlsVisible(true)}
         onClick={() => setIsAiOpen(true)} 
-        className="fixed bottom-8 right-8 z-40 bg-black/80 backdrop-blur-md text-white p-4 rounded-full shadow-[0_20px_40px_-10px_rgba(0,0,0,0.3)] hover:scale-105 active:scale-95 transition-all group flex items-center gap-0 overflow-hidden hover:pr-6 border border-white/10"
+        className="fixed bottom-5 right-5 z-40 bg-black/80 backdrop-blur-md text-white p-4 rounded-full shadow-[0_20px_40px_-10px_rgba(0,0,0,0.3)] hover:scale-105 active:scale-95 transition-all group flex items-center gap-0 overflow-hidden hover:pr-6 border border-white/10"
       >
         <Sparkles size={22} />
         <span className="max-w-0 group-hover:max-w-xs transition-all duration-300 overflow-hidden whitespace-nowrap font-medium text-[15px] pl-0 group-hover:pl-3">Ask AI</span>
-      </button>
+      </motion.button>
 
       <AICopilotModal isOpen={isAiOpen} onClose={() => setIsAiOpen(false)} />
     </div>
