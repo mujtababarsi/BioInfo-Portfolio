@@ -10,7 +10,7 @@ import {
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
   AreaChart, Area 
 } from 'recharts';
-import { motion, AnimatePresence, useInView } from 'framer-motion';
+import { motion, AnimatePresence, useInView, useScroll, useTransform, useSpring } from 'framer-motion';
 
 // --- CONFIGURATION & CONSTANTS ---
 const PROFILE_IMAGE_URL = "./me.png"; 
@@ -80,21 +80,22 @@ const SKILLS = [
 
 const PROJECTS = [
   {
-    title: "Covid-19 Single-Cell Analysis",
+    title: "Scanpy Single-Cell Analysis",
     tools: "Python | Scanpy | Jupyter Notebook",
     desc: "Conducted scRNA-seq downstream analysis on six PBMC samples to identify transcriptomic differences between COVID-19 patients and healthy controls.",
     tags: ["scRNA-seq", "COVID-19", "Scanpy"],
     features: ["Quality Control Pipeline", "Dimensionality Reduction", "Cell-type Prediction"],
-    // Placeholder image for glassmorphism demo (using abstract gradient if no image)
-    image: "https://images.unsplash.com/photo-1576086213369-97a306d36557?q=80&w=800&auto=format&fit=crop" 
+    image: "https://images.unsplash.com/photo-1576086213369-97a306d36557?q=80&w=800&auto=format&fit=crop",
+    link: "https://github.com/mujtababarsi/Scanpy-scRNA-seq-Analysis" 
   },
   {
-    title: "Spatial Transcriptomics Integration",
+    title: "Covid 19 scRNA-seq & Spatial Transcriptomics Integration",
     tools: "Python | Scanpy | Scanorama",
     desc: "Integrated spatial datasets with single-cell RNA-seq references using the Scanorama algorithm for accurate batch correction and cell-type mapping.",
     tags: ["Spatial", "Integration", "Scanorama"],
     features: ["Batch Correction", "Tissue Mapping", "High-Performance Vis"],
-    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop"
+    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=800&auto=format&fit=crop",
+    link: "https://github.com/mujtababarsi/Covid-19-single-cell-analysis-Scanpy"
   },
   {
     title: "Memory-Efficient scRNA-seq (Scarf)",
@@ -102,7 +103,8 @@ const PROJECTS = [
     desc: "Optimised analysis for a 10x Genomics 5K PBMC dataset using the Scarf package, leveraging Zarr and Dask for low-memory data chunking.",
     tags: ["Big Data", "Dask", "Zarr"],
     features: ["Low-Memory Chunking", "KNN Mapping", "Reference Projection"],
-    image: "https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?q=80&w=800&auto=format&fit=crop"
+    image: "https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?q=80&w=800&auto=format&fit=crop",
+    link: "https://github.com/mujtababarsi/Scarf-workflow-PBMC"
   },
   {
     title: "Data Visualisation with ggplot2",
@@ -110,7 +112,8 @@ const PROJECTS = [
     desc: "Generated publication-quality visualisations using the \"Grammar of Graphics\" framework to translate raw data into insightful graphical representations.",
     tags: ["R", "ggplot2", "EDA"],
     features: ["Publication Quality", "Exploratory Analysis", "Complex Faceting"],
-    image: "https://images.unsplash.com/photo-1543286386-2e659306cd6c?q=80&w=800&auto=format&fit=crop"
+    image: "https://images.unsplash.com/photo-1543286386-2e659306cd6c?q=80&w=800&auto=format&fit=crop",
+    link: "https://github.com/mujtababarsi/R-and-rstudio-Data-visualisation-with-ggplot2"
   }
 ];
 
@@ -178,54 +181,131 @@ const ADDITIONAL_INFO = {
   visa: "Transferable Iqama | Valid Driver license"
 };
 
+// --- ANIMATION VARIANTS (Stable) ---
+// Top-level section entrance
+const sectionVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { 
+    opacity: 1, 
+    y: 0,
+    transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } 
+  }
+};
+
+// Standard Container - Staggers children
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: { 
+    opacity: 1,
+    transition: { 
+      staggerChildren: 0.1,
+      delayChildren: 0.1
+    }
+  }
+};
+
+// Stable Container - Visible immediately, staggers children
+const stableContainerVariants = {
+  hidden: { opacity: 1 },
+  visible: { 
+    opacity: 1,
+    transition: { 
+      staggerChildren: 0.08,
+      delayChildren: 0.05
+    }
+  }
+};
+
+// Card Variant for Stability - Staggers its own list items
+const cardStaggerVariants = {
+  hidden: { opacity: 1 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.05
+    }
+  }
+};
+
+// Item cascade animation
+const itemVariants = {
+  hidden: { opacity: 0, y: 15, x: -10 },
+  visible: { 
+    opacity: 1, 
+    y: 0, 
+    x: 0,
+    transition: { type: "spring", stiffness: 100, damping: 20 }
+  }
+};
+
 // --- UTILITIES ---
 
 async function callGemini(prompt, systemInstruction = "") {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+  
   const payload = {
-    contents: [{ parts: [{ text: prompt }] }],
-    systemInstruction: { parts: [{ text: systemInstruction }] }
+    contents: [{ parts: [{ text: prompt }] }]
   };
+
+  // Only add systemInstruction if it is provided to avoid API errors with empty text
+  if (systemInstruction) {
+    payload.systemInstruction = { parts: [{ text: systemInstruction }] };
+  }
+
   try {
     const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
     const result = await response.json();
     return result.candidates?.[0]?.content?.parts?.[0]?.text || "No response generated.";
   } catch (err) {
-    return "Error generating response.";
+    console.error("Gemini API Error:", err);
+    return "Error generating response. Please check API key configuration.";
   }
 }
 
 // --- SUB-COMPONENTS ---
 
+function ParallaxBackground() {
+  const { scrollYProgress } = useScroll();
+  const y1 = useTransform(scrollYProgress, [0, 1], [0, -150]);
+  const y2 = useTransform(scrollYProgress, [0, 1], [0, 150]);
+  const rotate = useTransform(scrollYProgress, [0, 1], [0, 20]);
+   
+  return (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+       <motion.div style={{ y: y1, rotate }} className="absolute top-[5%] right-[-5%] w-[500px] h-[500px] bg-blue-100/20 rounded-full blur-3xl opacity-50" />
+       <motion.div style={{ y: y2, rotate: rotate }} className="absolute bottom-[10%] left-[-10%] w-[600px] h-[600px] bg-indigo-100/20 rounded-full blur-3xl opacity-50" />
+    </div>
+  );
+}
+
 function SectionHeading({ title, subtitle }) {
   return (
-    <div className="mb-6 text-center px-4">
-      <motion.h2 
-        initial={{ opacity: 0, y: 10 }} 
-        whileInView={{ opacity: 1, y: 0 }} 
-        viewport={{ once: true }} 
-        className="text-xl md:text-2xl font-bold text-[#1d1d1f] tracking-tight"
-      >
+    <motion.div 
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: false, amount: 0.5 }}
+      variants={sectionVariants}
+      className="mb-6 text-center px-4"
+    >
+      <h2 className="text-xl md:text-2xl font-bold text-[#1d1d1f] tracking-tight">
         {title}
-      </motion.h2>
-      
+      </h2>
       <div className="w-12 h-1 bg-[#0071e3]/20 mx-auto rounded-full my-3" />
-
       {subtitle && (
-        <motion.p 
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          transition={{ delay: 0.2 }}
-          className="text-[#86868b] max-w-lg mx-auto text-xs md:text-sm font-medium leading-relaxed"
-        >
+        <p className="text-[#86868b] max-w-lg mx-auto text-xs md:text-sm font-medium leading-relaxed">
           {subtitle}
-        </motion.p>
+        </p>
       )}
-    </div>
+    </motion.div>
   );
 }
 
@@ -270,7 +350,6 @@ function AIProjectInsight({ project }) {
     setLoading(false);
   }
 
-  // UPDATED: Theme-consistent colors (Blue/Gray instead of Lime) for light theme
   return (
     <div className="mt-auto pt-4 border-t border-black/5 w-full">
       {!insight ? (
@@ -322,7 +401,7 @@ function AICopilotModal({ isOpen, onClose }) {
         className="absolute inset-0 bg-black/20 backdrop-blur-md" 
         onClick={onClose} 
       />
-      
+       
       <motion.div 
         initial={{ opacity: 0, scale: 0.95, y: 10 }} 
         animate={{ opacity: 1, scale: 1, y: 0 }} 
@@ -456,51 +535,7 @@ function Navbar({ scrollTo }) {
   );
 }
 
-function Footer() {
-  const currentYear = new Date().getFullYear();
-  
-  return (
-    <footer className="py-10 bg-[#F5F5F7] border-t border-[#d2d2d7]/50">
-      <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center md:items-end gap-6">
-        
-        {/* Left Side: Copyright & Location */}
-        <div className="flex flex-col gap-3 items-center md:items-start text-center md:text-left">
-           {/* Replaced Brand Icon with Copyright as requested */}
-           <p className="text-[11px] text-[#86868b] font-medium tracking-wide">
-             © {currentYear} Mohamed Elmugtaba. All rights reserved.
-           </p>
-           
-           {/* Location Icon at bottom left */}
-           <div className="flex items-center gap-1.5 opacity-80 hover:opacity-100 transition-opacity">
-             <MapPin size={14} strokeWidth={1.5} className="text-[#1d1d1f]" />
-             <span className="text-[11px] text-[#424245] font-medium">Riyadh, KSA</span>
-           </div>
-        </div>
-
-        {/* Right Side: Minimalist Icons */}
-        <div className="flex items-center gap-5">
-           <a 
-             href="https://github.com/mujtababarsi" 
-             target="_blank" 
-             rel="noreferrer"
-             className="text-[#86868b] hover:text-[#1d1d1f] transition-colors duration-300"
-             aria-label="GitHub"
-           >
-             <Github size={16} strokeWidth={1.5} />
-           </a>
-           <a 
-             href="mailto:Mujtababarsi@mail.com" 
-             className="text-[#86868b] hover:text-[#1d1d1f] transition-colors duration-300"
-             aria-label="Email"
-           >
-             <Mail size={16} strokeWidth={1.5} />
-           </a>
-        </div>
-        
-      </div>
-    </footer>
-  );
-}
+// Removed standalone Footer component to integrate into Personal Details section
 
 function TypewriterText() {
   const segments = [
@@ -632,13 +667,19 @@ export default function App() {
   // Projects State
   const [projectIndex, setProjectIndex] = useState(0);
   const autoSlideRef = useRef(null);
-  
+   
   // Experience State - using selection instead of scroll
   const [selectedExpIndex, setSelectedExpIndex] = useState(0);
 
   // Smart Toggle Logic
   const [controlsVisible, setControlsVisible] = useState(true);
   const scrollTimeoutRef = useRef(null);
+
+  // Scroll Animations hooks
+  const { scrollYProgress } = useScroll({ container: mainContainerRef });
+  // Parallax transform for blobs
+  const blobY = useTransform(scrollYProgress, [0, 1], [0, -100]);
+  const blobRotate = useTransform(scrollYProgress, [0, 1], [0, 45]);
 
   // Helper function to handle visibility
   const showDockTemporarily = () => {
@@ -688,12 +729,12 @@ export default function App() {
     setProjectIndex((prev) => (prev + 2) % PROJECTS.length);
     resetAutoSlide(); 
   };
-  
+   
   const visibleProjects = PROJECTS.slice(projectIndex, projectIndex + 2);
 
   // --- EXPERIENCE LOGIC (INTERVAL BASED CAROUSEL) ---
   // Re-added for continuous flow
-  
+   
   // Scroll Spy Logic for Active Section
   const handleScroll = (e) => {
     const container = e.target;
@@ -738,16 +779,15 @@ export default function App() {
 
       {/* HERO Section */}
       <section id="home" className="snap-start min-h-screen relative pt-32 md:pt-40 pb-20 bg-[#F5F5F7] flex items-start justify-center">
-        <div className="max-w-5xl mx-auto px-6 w-full">
-          <div className="grid lg:grid-cols-2 gap-8 items-center">
+        <ParallaxBackground />
+        <div className="max-w-5xl mx-auto px-6 w-full relative z-10">
+          <motion.div 
+             initial="hidden" whileInView="visible" viewport={{ once: false, amount: 0.2 }} variants={containerVariants}
+             className="grid lg:grid-cols-2 gap-8 items-center"
+          >
             
             {/* Left Side */}
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }} 
-              animate={{ opacity: 1, y: 0 }} 
-              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }} 
-              className="flex flex-col items-center lg:items-start text-center lg:text-left"
-            >
+            <motion.div variants={itemVariants} className="flex flex-col items-center lg:items-start text-center lg:text-left">
               <ProfilePicHolder />
               
               <div className="mt-6 flex flex-col items-center lg:items-start w-full space-y-3">
@@ -767,12 +807,7 @@ export default function App() {
             </motion.div>
 
             {/* Right Side - Justified Brief Content */}
-            <motion.div 
-              initial={{ opacity: 0, y: 30 }} 
-              animate={{ opacity: 1, y: 0 }} 
-              transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }} 
-              className="flex flex-col items-center lg:items-start text-center lg:text-left"
-            >
+            <motion.div variants={itemVariants} className="flex flex-col items-center lg:items-start text-center lg:text-left">
               <div className="text-lg md:text-xl text-[#1d1d1f] font-normal leading-relaxed tracking-tight max-w-lg mb-8 text-justify hyphens-auto">
                 <TypewriterText />
               </div>
@@ -791,22 +826,22 @@ export default function App() {
               </div>
             </motion.div>
 
-          </div>
+          </motion.div>
         </div>
       </section>
 
-      {/* ME Section */}
-      <section id="me" className="snap-start min-h-screen pt-28 pb-16 bg-white flex items-start justify-center">
-        <div className="max-w-7xl mx-auto px-6 w-full">
+      {/* ME Section - ENHANCED VISUALS */}
+      <section id="me" className="snap-start min-h-screen pt-28 pb-16 bg-gradient-to-br from-white via-indigo-50/10 to-blue-50/10 flex items-start justify-center relative overflow-hidden">
+        <ParallaxBackground />
+         
+        <div className="max-w-7xl mx-auto px-6 w-full relative z-10">
           <SectionHeading title="At the Intersection of Pharmacy & Bioinformatics" subtitle="Bridging clinical expertise with computational precision." />
-          <div className="grid lg:grid-cols-2 gap-10 items-start">
+          <motion.div 
+             initial="hidden" whileInView="visible" viewport={{ once: false, amount: 0.2 }} variants={containerVariants}
+             className="grid lg:grid-cols-2 gap-10 items-start"
+          >
             
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }} 
-              whileInView={{ opacity: 1, y: 0 }} 
-              viewport={{ once: true }} 
-              className="space-y-5"
-            >
+            <motion.div variants={itemVariants} className="space-y-5 bg-white/60 backdrop-blur-sm p-8 rounded-[2rem] border border-white/50 shadow-sm">
               <div className="flex items-center gap-2 text-[#0071e3]">
                 <FileText size={22} strokeWidth={1.5} />
                 <span className="text-[12px] font-semibold uppercase tracking-widest">Bio</span>
@@ -816,14 +851,8 @@ export default function App() {
               </p>
             </motion.div>
 
-            {/* Apple Health-style Chart Card */}
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.95 }} 
-              whileInView={{ opacity: 1, scale: 1 }} 
-              viewport={{ once: true }} 
-              transition={{ type: "spring", stiffness: 200, damping: 25 }}
-              className="bg-[#F5F5F7] p-6 rounded-[2.5rem] relative overflow-hidden ring-1 ring-black/5"
-            >
+            {/* Apple Health-style Chart Card - ENHANCED */}
+            <motion.div variants={itemVariants} className="bg-white/60 backdrop-blur-xl border border-white/50 p-6 rounded-[2.5rem] relative overflow-hidden shadow-xl ring-1 ring-black/5">
               <div className="flex justify-between items-center mb-6">
                 <div className="flex items-center gap-2">
                   <div className="bg-[#0071e3] p-1.5 rounded-md text-white"><Terminal size={16} /></div>
@@ -852,26 +881,28 @@ export default function App() {
                 </ResponsiveContainer>
               </div>
             </motion.div>
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* AREAS OF EXPERTISE - ENHANCED DESIGN */}
       <section id="expertise" className="snap-start min-h-screen pt-28 pb-16 bg-gradient-to-b from-white to-blue-50/30 flex items-start justify-center relative overflow-hidden">
-        {/* Decorative background elements */}
-        <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-           <div className="absolute top-[10%] left-[-5%] w-[400px] h-[400px] bg-blue-100/20 rounded-full blur-3xl" />
-           <div className="absolute bottom-[10%] right-[-5%] w-[400px] h-[400px] bg-indigo-100/20 rounded-full blur-3xl" />
-        </div>
+        <ParallaxBackground />
 
         <div className="max-w-7xl mx-auto px-6 w-full relative z-10">
           <SectionHeading title="Areas of Expertise" />
-          <div className="grid md:grid-cols-3 gap-4">
+          <motion.div 
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: false, amount: 0.2 }}
+            className="grid md:grid-cols-3 gap-4"
+          >
             {AREAS_OF_EXPERTISE.map((area, idx) => (
               <motion.div 
                 key={idx} 
+                variants={itemVariants}
                 whileHover={{ y: -8, boxShadow: "0 20px 40px -12px rgba(0,0,0,0.1)" }}
-                transition={{ type: "spring", stiffness: 300, damping: 20 }}
                 className="bg-white/80 backdrop-blur-sm p-6 rounded-[2rem] border border-black/5 h-full flex flex-col relative group shadow-sm"
               >
                 {/* Icon Header */}
@@ -897,7 +928,7 @@ export default function App() {
                 </div>
               </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
@@ -905,10 +936,17 @@ export default function App() {
       <section className="snap-start min-h-screen pt-28 pb-16 bg-white flex items-start justify-center relative">
          {/* Subtle technical grid background pattern */}
          <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none" />
+         <ParallaxBackground />
 
         <div className="max-w-7xl mx-auto px-6 w-full relative z-10">
           <SectionHeading title="Technical Skills" />
-          <div className="grid md:grid-cols-3 gap-6">
+          <motion.div 
+            variants={stableContainerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: false, amount: 0.2 }}
+            className="grid md:grid-cols-3 gap-6"
+          >
             {SKILLS.map((skill, idx) => (
               <motion.div 
                 key={idx} 
@@ -929,9 +967,7 @@ export default function App() {
                   {skill.items.map((item, i) => (
                     <motion.div 
                       key={i}
-                      initial={{ opacity: 0, x: -10 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      transition={{ delay: idx * 0.1 + i * 0.05 }}
+                      variants={itemVariants}
                       className="flex items-center gap-3 group/item"
                     >
                       <div className="w-5 h-5 rounded-full bg-white flex items-center justify-center shadow-sm text-[#0071e3] group-hover/item:scale-110 transition-transform ring-1 ring-black/5">
@@ -945,26 +981,26 @@ export default function App() {
                 </div>
               </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
-      {/* PROJECTS: RESTORED TO LIGHT THEME - ENHANCED */}
+      {/* PROJECTS: RESTORED TO LIGHT THEME - ENHANCED (DEPTH TEXTURE) */}
       <section id="projects" className="snap-start min-h-screen pt-12 pb-12 bg-[#F5F5F7] flex items-start justify-center relative overflow-hidden">
-        {/* Subtle Decorative Background Blob */}
-        <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] bg-blue-100/30 rounded-full blur-3xl opacity-50 pointer-events-none" />
-        
+        <ParallaxBackground />
+         
         <div className="max-w-4xl mx-auto px-6 w-full relative z-10">
           <div className="mb-8 text-center px-4">
              <h2 className="text-xl md:text-2xl font-bold text-[#1d1d1f] tracking-tight">Selected Projects</h2>
              <div className="w-12 h-1 bg-[#0071e3]/20 mx-auto rounded-full my-3" />
           </div>
-          
-          <div className="relative grid grid-cols-1 min-h-[22rem]"> 
+           
+          {/* Fixed height container to prevent layout shifts - Reduced height */}
+          <div className="relative grid grid-cols-1 h-[29rem] md:h-[26rem]"> 
             <AnimatePresence initial={false}>
               <motion.div 
                 key={projectIndex} 
-                className="grid grid-cols-2 gap-6 col-start-1 row-start-1 w-full" 
+                className="grid grid-cols-1 md:grid-cols-2 gap-6 col-start-1 row-start-1 w-full h-full" 
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
@@ -973,49 +1009,61 @@ export default function App() {
                 {visibleProjects.map((p, idx) => (
                   <div 
                     key={p.title} 
-                    className="bg-white/80 backdrop-blur-md rounded-[2rem] border border-white/60 p-5 flex flex-col h-full hover:shadow-xl hover:shadow-blue-500/5 transition-all duration-500 group ring-1 ring-black/5"
+                    className="relative bg-gradient-to-br from-white to-[#F2F2F7] rounded-[2.5rem] p-5 flex flex-col h-full border border-white/80 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.08)] ring-1 ring-black/5 hover:shadow-[0_25px_60px_-15px_rgba(0,0,0,0.15)] hover:scale-[1.02] transition-all duration-500 group overflow-hidden"
                   >
-                    {/* Compact Image */}
-                    <div className="h-36 w-full rounded-xl overflow-hidden mb-4 border border-black/5 bg-gray-50 relative group-hover:scale-[1.02] transition-transform duration-500">
-                       <div className={`w-full h-full transform transition-transform duration-500 group-hover:scale-110 flex items-center justify-center text-[#86868b]`}>
-                          {p.image ? <img src={p.image} alt={p.title} className="w-full h-full object-cover" /> : <Globe size={48} />}
-                       </div>
-                       {/* Subtle overlay on hover */}
-                       <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-500" />
+                    {/* Compact Image - Reduced Height */}
+                    <div className="h-32 w-full rounded-2xl overflow-hidden mb-3 border border-black/5 bg-white shadow-inner relative group-hover:scale-[1.02] transition-transform duration-500 shrink-0">
+                        <div className={`w-full h-full transform transition-transform duration-500 group-hover:scale-110 flex items-center justify-center text-[#86868b]`}>
+                           {p.image ? <img src={p.image} alt={p.title} className="w-full h-full object-cover" /> : <Globe size={48} />}
+                        </div>
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-500" />
                     </div>
 
                     <div className="flex flex-col flex-grow">
-                        <div className="flex justify-between items-start mb-2">
-                             <h3 className="text-base font-bold text-[#1d1d1f] leading-tight group-hover:text-[#0071e3] transition-colors">{p.title}</h3>
-                             <div className="bg-[#0071e3]/10 p-1.5 rounded-lg text-[#0071e3]">
+                        <div className="flex justify-between items-start mb-1 h-10">
+                             <h3 className="text-sm font-bold text-[#1d1d1f] leading-tight group-hover:text-[#0071e3] transition-colors line-clamp-2">{p.title}</h3>
+                             <div className="bg-[#0071e3]/10 p-1.5 rounded-lg text-[#0071e3] shrink-0">
                                 <Code size={14} />
                              </div>
                         </div>
 
-                        <p className="text-[#0071e3] text-[10px] font-bold uppercase tracking-wide mb-3">{p.tools}</p>
+                        <div className="mb-2 h-4">
+                          <p className="text-[#0071e3] text-[10px] font-bold uppercase tracking-wide truncate">{p.tools}</p>
+                        </div>
                         
-                        <p className="text-[#424245] text-[12px] leading-relaxed line-clamp-3 mb-4 flex-grow font-medium">
+                        {/* Reduced description height approx 3 lines */}
+                        <p className="text-[#424245] text-[12px] leading-relaxed line-clamp-2 md:line-clamp-3 mb-3 flex-grow font-medium h-[3.6rem]">
                           {p.desc}
                         </p>
                         
-                        {/* Features List (Compact) */}
+                        {/* Features List (Compact) - Reduced margin */}
                         {p.features && (
-                            <ul className="mb-4 space-y-1.5">
+                            <ul className="mb-3 space-y-1 h-10">
                                 {p.features.slice(0,2).map((feat, i) => (
-                                    <li key={i} className="flex items-center gap-2 text-[10px] text-[#424245]/80 font-medium">
-                                        <div className="w-1 h-1 rounded-full bg-[#0071e3]" /> {feat}
+                                    <li key={i} className="flex items-center gap-2 text-[10px] text-[#424245]/80 font-medium truncate">
+                                        <div className="w-1 h-1 rounded-full bg-[#0071e3] shrink-0" /> {feat}
                                     </li>
                                 ))}
                             </ul>
                         )}
 
                         <div className="flex gap-2 mt-auto">
-                            <button className="flex-1 bg-[#0071e3] hover:bg-[#005bb5] text-white text-[11px] font-bold py-2.5 rounded-xl transition-all shadow-md shadow-blue-500/20 hover:shadow-blue-500/40 flex items-center justify-center gap-1 active:scale-95">
+                            <a 
+                                href={p.link} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="flex-1 bg-[#1d1d1f] hover:bg-[#0071e3] text-white text-[11px] font-bold py-2.5 rounded-xl transition-all shadow-md shadow-black/10 hover:shadow-blue-500/40 flex items-center justify-center gap-1 active:scale-95"
+                            >
                                 View Project <ArrowRight size={12} />
-                            </button>
-                             <button className="px-3 bg-white hover:bg-gray-50 text-[#1d1d1f] rounded-xl border border-black/10 transition-colors shadow-sm hover:shadow-md">
+                            </a>
+                             <a 
+                                href={p.link}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="px-3 bg-white hover:bg-gray-50 text-[#1d1d1f] rounded-xl border border-black/10 transition-colors shadow-sm hover:shadow-md flex items-center justify-center"
+                             >
                                 <Github size={14} />
-                            </button>
+                             </a>
                         </div>
                     </div>
                   </div>
@@ -1037,12 +1085,16 @@ export default function App() {
 
       {/* EXPERIENCE - ENHANCED VISUALS */}
       <section id="experience" className="snap-start min-h-screen pt-20 pb-16 bg-white flex items-start justify-center relative">
+        <ParallaxBackground />
         <div className="max-w-6xl mx-auto px-6 w-full relative z-10">
           <SectionHeading title="Professional Experience" />
 
-          <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-8 h-[26rem]">
+          <motion.div 
+             initial="hidden" whileInView="visible" viewport={{ once: false, amount: 0.2 }} variants={containerVariants}
+             className="grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-8 h-[26rem]"
+          >
             {/* LEFT: TIMELINE LIST */}
-            <div className="flex flex-col gap-3 overflow-y-auto pr-2 custom-scrollbar">
+            <motion.div variants={itemVariants} className="flex flex-col gap-3 overflow-y-auto pr-2 custom-scrollbar">
               {EXPERIENCE.map((exp, idx) => (
                 <button
                   key={idx}
@@ -1065,7 +1117,7 @@ export default function App() {
                   <p className="text-[11px] text-[#86868b] truncate font-medium">{exp.org}</p>
                 </button>
               ))}
-            </div>
+            </motion.div>
 
             {/* RIGHT: DETAIL CARD */}
             <div className="relative h-full">
@@ -1100,26 +1152,31 @@ export default function App() {
                   </p>
 
                   <div className="mt-8 flex gap-3 relative z-10">
-                     <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white text-[#1d1d1f] text-xs font-semibold border border-black/5 shadow-sm">
-                        <Calendar size={14} className="text-[#86868b]" /> {EXPERIENCE[selectedExpIndex].period}
-                     </span>
-                     <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white text-[#1d1d1f] text-xs font-semibold border border-black/5 shadow-sm">
-                        <MapPin size={14} className="text-[#86868b]" /> Khartoum, Sudan
-                     </span>
+                      <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white text-[#1d1d1f] text-xs font-semibold border border-black/5 shadow-sm">
+                         <Calendar size={14} className="text-[#86868b]" /> {EXPERIENCE[selectedExpIndex].period}
+                      </span>
+                      <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white text-[#1d1d1f] text-xs font-semibold border border-black/5 shadow-sm">
+                         <MapPin size={14} className="text-[#86868b]" /> Khartoum, Sudan
+                      </span>
                   </div>
                 </motion.div>
               </AnimatePresence>
             </div>
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* EDUCATION - ENHANCED CARD */}
       <section id="education" className="snap-start min-h-screen pt-28 pb-16 bg-gradient-to-tr from-blue-50/50 via-white to-blue-50/50 flex items-start justify-center">
-        <div className="max-w-4xl mx-auto px-6 w-full">
+        <ParallaxBackground />
+        <div className="max-w-4xl mx-auto px-6 w-full relative z-10">
           <SectionHeading title="Education" />
           {EDUCATION_DATA.map((edu, idx) => (
-            <div key={idx} className="bg-white/80 backdrop-blur-xl p-10 rounded-[3rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.05)] border border-white/50 text-center md:text-left relative overflow-hidden group">
+            <motion.div 
+               key={idx} 
+               initial="hidden" whileInView="visible" viewport={{ once: false, amount: 0.2 }} variants={sectionVariants}
+               className="bg-white/80 backdrop-blur-xl p-10 rounded-[3rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.05)] border border-white/50 text-center md:text-left relative overflow-hidden group"
+            >
               <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-blue-50/50 to-transparent rounded-bl-full pointer-events-none" />
               
               <div className="flex flex-col md:flex-row justify-between mb-8 items-center md:items-start gap-4 relative z-10">
@@ -1136,150 +1193,202 @@ export default function App() {
                 </p>
                 <p className="text-[#1d1d1f] leading-relaxed text-[15px] font-medium">{edu.details}</p>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       </section>
 
       {/* CERTIFICATIONS & PROFESSIONAL DEVELOPMENT - ENHANCED CARDS */}
-      <section className="snap-start min-h-screen pt-20 pb-16 bg-white border-t border-[#F5F5F7] flex items-start justify-center">
-        <div className="max-w-7xl mx-auto px-6 w-full">
+      <section className="snap-start min-h-screen pt-16 pb-32 bg-white relative flex items-start justify-center overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] opacity-40 pointer-events-none" />
+        <ParallaxBackground />
+         
+        <div className="max-w-7xl mx-auto px-6 w-full relative z-10">
           <SectionHeading title="Certifications & Professional Development" />
-          <div className="grid md:grid-cols-2 gap-12">
+          <motion.div 
+            variants={stableContainerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: false, amount: 0.2 }}
+            className="grid md:grid-cols-2 gap-5"
+          >
             {CERTIFICATES_PARTS.map((part, idx) => (
-              <div key={idx} className="flex flex-col">
-                <div className="mb-6 pb-4 border-b border-[#F5F5F7] flex items-center gap-3">
-                  <div className="p-2 bg-blue-50 rounded-lg text-[#0071e3]">
-                    {idx === 0 ? <Cpu size={20} /> : <Award size={20} />}
+              <motion.div 
+                key={idx} 
+                variants={cardStaggerVariants}
+                className="bg-white/80 backdrop-blur-sm rounded-[2.5rem] p-6 border border-black/5 shadow-sm hover:shadow-lg transition-all duration-500 group flex flex-col h-full"
+              >
+                <div className="mb-4 pb-3 border-b border-gray-100 flex items-center gap-4">
+                  <div className="p-3 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl text-[#0071e3] shadow-inner">
+                    {idx === 0 ? <Cpu size={24} strokeWidth={1.5} /> : <Award size={24} strokeWidth={1.5} />}
                   </div>
-                  <h3 className="text-xl font-bold text-[#1d1d1f] tracking-tight">
+                  <h3 className="text-xl font-bold text-[#1d1d1f] tracking-tight group-hover:text-[#0071e3] transition-colors">
                     {part.title}
                   </h3>
                 </div>
-                <div className="space-y-3">
+                <div className="space-y-2 flex-grow">
                   {part.items.map((cert, i) => (
                     <motion.div 
                       key={i} 
-                      whileHover={{ x: 6, backgroundColor: "#F9FAFB", borderColor: "#E5E7EB" }} 
-                      transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                      className="group p-4 rounded-2xl border border-transparent hover:border-gray-200 bg-white hover:shadow-sm transition-all duration-300 cursor-default flex items-start gap-4"
+                      variants={itemVariants}
+                      className="group/item p-3 rounded-2xl border border-transparent hover:border-blue-100 bg-transparent hover:shadow-sm cursor-default flex items-start gap-3 hover:bg-gray-50"
                     >
-                      <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-gray-300 group-hover:bg-[#0071e3] group-hover:scale-125 transition-all shrink-0" />
-                      <p className="text-[15px] font-medium text-[#424245] group-hover:text-[#1d1d1f] leading-snug transition-colors">
+                      <div className="mt-1.5 w-1.5 h-4 rounded-full bg-gray-200 group-hover/item:bg-[#0071e3] group-hover/item:scale-y-110 transition-all shrink-0" />
+                      <p className="text-[14px] font-medium text-[#424245] group-hover/item:text-[#1d1d1f] leading-snug transition-colors">
                         {cert}
                       </p>
                     </motion.div>
                   ))}
                 </div>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* ADDITIONAL INFO - VISUALLY ENHANCED BENTO LAYOUT */}
-      <section className="snap-start min-h-screen pt-28 pb-24 bg-gradient-to-br from-slate-50 to-gray-100 flex items-start justify-center relative overflow-hidden">
-        {/* Subtle Background Elements */}
+      <section className="snap-start min-h-screen pt-28 pb-10 bg-gradient-to-br from-slate-50 to-gray-100 flex items-start justify-center relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-             <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-blue-100/40 rounded-full blur-3xl opacity-60" />
-             <div className="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-indigo-50/40 rounded-full blur-3xl opacity-60" />
+              <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-blue-100/40 rounded-full blur-3xl opacity-60" />
+              <div className="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-indigo-50/40 rounded-full blur-3xl opacity-60" />
         </div>
 
-        <div className="max-w-5xl mx-auto px-6 w-full relative z-10">
-          <SectionHeading title="Personal Details" />
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="max-w-5xl mx-auto px-6 w-full relative z-10 flex flex-col h-full justify-between">
+          <div>
+            <SectionHeading title="Personal Details" />
             
-            {/* Card 1: Identity & Connect */}
             <motion.div 
-              whileHover={{ y: -8 }}
-              transition={{ type: "spring", stiffness: 300, damping: 20 }}
-              className="md:col-span-1 bg-white/80 backdrop-blur-xl rounded-[2.5rem] p-6 flex flex-col items-center justify-center text-center shadow-[0_20px_40px_-12px_rgba(0,0,0,0.05)] border border-white/60 relative overflow-hidden group ring-1 ring-black/5"
+              initial="hidden" whileInView="visible" viewport={{ once: false, amount: 0.2 }} variants={containerVariants}
+              className="grid grid-cols-1 md:grid-cols-3 gap-6"
             >
-                <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-b from-[#0071e3]/5 to-transparent transition-opacity duration-500 group-hover:opacity-80" />
-                
-                <div className="relative w-24 h-24 rounded-full overflow-hidden ring-4 ring-white shadow-xl mb-6 group-hover:scale-105 transition-transform duration-500">
-                    <img src={PROFILE_IMAGE_URL} alt="Profile" className="w-full h-full object-cover" />
-                </div>
-                
-                <h3 className="text-lg font-bold text-[#1d1d1f] tracking-tight">M. Elmugtaba</h3>
-                <p className="text-xs font-medium text-[#0071e3] mt-1 mb-6">Bioinformatician & Pharmacist</p>
-                
-                <div className="flex gap-3 w-full justify-center relative z-10">
-                   <a href="mailto:Mujtababarsi@mail.com" className="p-3 rounded-full bg-white text-[#1d1d1f] hover:bg-[#0071e3] hover:text-white transition-all duration-300 shadow-sm border border-black/5">
-                     <Mail size={18} strokeWidth={2} />
-                   </a>
-                   <a href="https://github.com/mujtababarsi" target="_blank" className="p-3 rounded-full bg-white text-[#1d1d1f] hover:bg-[#0071e3] hover:text-white transition-all duration-300 shadow-sm border border-black/5">
-                     <Github size={18} strokeWidth={2} />
-                   </a>
-                </div>
+              
+              {/* Card 1: Identity & Connect */}
+              <motion.div 
+                variants={itemVariants}
+                whileHover={{ y: -8 }}
+                transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                className="md:col-span-1 bg-white/80 backdrop-blur-xl rounded-[2.5rem] p-6 flex flex-col items-center justify-center text-center shadow-[0_20px_40px_-12px_rgba(0,0,0,0.05)] border border-white/60 relative overflow-hidden group ring-1 ring-black/5"
+              >
+                  <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-b from-[#0071e3]/5 to-transparent transition-opacity duration-500 group-hover:opacity-80" />
+                  
+                  <div className="relative w-24 h-24 rounded-full overflow-hidden ring-4 ring-white shadow-xl mb-6 group-hover:scale-105 transition-transform duration-500">
+                      <img src={PROFILE_IMAGE_URL} alt="Profile" className="w-full h-full object-cover" />
+                  </div>
+                  
+                  <h3 className="text-lg font-bold text-[#1d1d1f] tracking-tight">M. Elmugtaba</h3>
+                  <p className="text-xs font-medium text-[#0071e3] mt-1 mb-6">Bioinformatician & Pharmacist</p>
+                  
+                  <div className="flex gap-3 w-full justify-center relative z-10">
+                    <a href="mailto:Mujtababarsi@mail.com" className="p-3 rounded-full bg-white text-[#1d1d1f] hover:bg-[#0071e3] hover:text-white transition-all duration-300 shadow-sm border border-black/5">
+                      <Mail size={18} strokeWidth={2} />
+                    </a>
+                    <a href="https://github.com/mujtababarsi" target="_blank" className="p-3 rounded-full bg-white text-[#1d1d1f] hover:bg-[#0071e3] hover:text-white transition-all duration-300 shadow-sm border border-black/5">
+                      <Github size={18} strokeWidth={2} />
+                    </a>
+                  </div>
+              </motion.div>
+
+              {/* Card 2: Details Grid */}
+              <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  
+                  {/* Location */}
+                  <motion.div 
+                    variants={itemVariants}
+                    whileHover={{ y: -5 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                    className="bg-white/80 backdrop-blur-xl rounded-[2.5rem] p-6 flex flex-col justify-between shadow-[0_20px_40px_-12px_rgba(0,0,0,0.05)] border border-white/60 ring-1 ring-black/5 group"
+                  >
+                      <div className="w-10 h-10 rounded-2xl bg-blue-50 text-[#0071e3] flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                          <MapPin size={20} strokeWidth={2} />
+                      </div>
+                      <div>
+                          <span className="text-[10px] font-bold text-[#86868b] uppercase tracking-widest">Location</span>
+                          <p className="text-lg font-bold text-[#1d1d1f] mt-1 tracking-tight">{ADDITIONAL_INFO.location}</p>
+                          <p className="text-[12px] text-[#86868b] font-medium mt-1">Open to Relocation</p>
+                      </div>
+                  </motion.div>
+
+                  {/* Languages */}
+                  <motion.div 
+                    variants={itemVariants}
+                    whileHover={{ y: -5 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                    className="bg-white/80 backdrop-blur-xl rounded-[2.5rem] p-6 flex flex-col justify-between shadow-[0_20px_40px_-12px_rgba(0,0,0,0.05)] border border-white/60 ring-1 ring-black/5 group"
+                  >
+                        <div className="w-10 h-10 rounded-2xl bg-indigo-50 text-indigo-500 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                          <Globe size={20} strokeWidth={2} />
+                      </div>
+                      <div>
+                          <span className="text-[10px] font-bold text-[#86868b] uppercase tracking-widest">Languages</span>
+                          <p className="text-lg font-bold text-[#1d1d1f] mt-1 tracking-tight">{ADDITIONAL_INFO.languages}</p>
+                          <p className="text-[12px] text-[#86868b] font-medium mt-1">Native & Professional</p>
+                      </div>
+                  </motion.div>
+
+                  {/* Status/Visa - Wide Card */}
+                  <motion.div 
+                    variants={itemVariants}
+                    whileHover={{ y: -5 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                    className="sm:col-span-2 bg-white/80 backdrop-blur-xl rounded-[2.5rem] p-6 flex flex-col sm:flex-row sm:items-center gap-6 sm:gap-8 shadow-[0_20px_40px_-12px_rgba(0,0,0,0.05)] border border-white/60 ring-1 ring-black/5 group"
+                  >
+                        <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex-shrink-0 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                          <Activity size={24} strokeWidth={2} />
+                      </div>
+                      <div>
+                          <span className="text-[10px] font-bold text-[#86868b] uppercase tracking-widest">Professional Status</span>
+                          <div className="flex flex-col sm:flex-row sm:items-center sm:gap-8 mt-2">
+                              <div className="flex items-center gap-3">
+                                <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.4)]" />
+                                <p className="text-[14px] font-semibold text-[#1d1d1f]">Transferable Iqama</p>
+                              </div>
+                              <div className="hidden sm:block w-px h-5 bg-black/10" />
+                              <div className="flex items-center gap-3">
+                                <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.4)]" />
+                                <p className="text-[14px] font-semibold text-[#1d1d1f]">Valid Driver License</p>
+                              </div>
+                          </div>
+                      </div>
+                  </motion.div>
+              </div>
             </motion.div>
-
-            {/* Card 2: Details Grid */}
-            <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
-                
-                {/* Location */}
-                <motion.div 
-                  whileHover={{ y: -5 }}
-                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                  className="bg-white/80 backdrop-blur-xl rounded-[2.5rem] p-6 flex flex-col justify-between shadow-[0_20px_40px_-12px_rgba(0,0,0,0.05)] border border-white/60 ring-1 ring-black/5 group"
-                >
-                    <div className="w-10 h-10 rounded-2xl bg-blue-50 text-[#0071e3] flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-                        <MapPin size={20} strokeWidth={2} />
-                    </div>
-                    <div>
-                        <span className="text-[10px] font-bold text-[#86868b] uppercase tracking-widest">Location</span>
-                        <p className="text-lg font-bold text-[#1d1d1f] mt-1 tracking-tight">{ADDITIONAL_INFO.location}</p>
-                        <p className="text-[12px] text-[#86868b] font-medium mt-1">Open to Relocation</p>
-                    </div>
-                </motion.div>
-
-                {/* Languages */}
-                <motion.div 
-                  whileHover={{ y: -5 }}
-                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                  className="bg-white/80 backdrop-blur-xl rounded-[2.5rem] p-6 flex flex-col justify-between shadow-[0_20px_40px_-12px_rgba(0,0,0,0.05)] border border-white/60 ring-1 ring-black/5 group"
-                >
-                     <div className="w-10 h-10 rounded-2xl bg-indigo-50 text-indigo-500 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-                        <Globe size={20} strokeWidth={2} />
-                    </div>
-                    <div>
-                        <span className="text-[10px] font-bold text-[#86868b] uppercase tracking-widest">Languages</span>
-                        <p className="text-lg font-bold text-[#1d1d1f] mt-1 tracking-tight">{ADDITIONAL_INFO.languages}</p>
-                        <p className="text-[12px] text-[#86868b] font-medium mt-1">Native & Professional</p>
-                    </div>
-                </motion.div>
-
-                {/* Status/Visa - Wide Card */}
-                <motion.div 
-                   whileHover={{ y: -5 }}
-                   transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                   className="sm:col-span-2 bg-white/80 backdrop-blur-xl rounded-[2.5rem] p-6 flex flex-col sm:flex-row sm:items-center gap-6 sm:gap-8 shadow-[0_20px_40px_-12px_rgba(0,0,0,0.05)] border border-white/60 ring-1 ring-black/5 group"
-                >
-                     <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex-shrink-0 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                        <Activity size={24} strokeWidth={2} />
-                    </div>
-                    <div>
-                        <span className="text-[10px] font-bold text-[#86868b] uppercase tracking-widest">Professional Status</span>
-                        <div className="flex flex-col sm:flex-row sm:items-center sm:gap-8 mt-2">
-                            <div className="flex items-center gap-3">
-                              <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.4)]" />
-                              <p className="text-[14px] font-semibold text-[#1d1d1f]">Transferable Iqama</p>
-                            </div>
-                            <div className="hidden sm:block w-px h-5 bg-black/10" />
-                            <div className="flex items-center gap-3">
-                              <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.4)]" />
-                              <p className="text-[14px] font-semibold text-[#1d1d1f]">Valid Driver License</p>
-                            </div>
-                        </div>
-                    </div>
-                </motion.div>
+          </div>
+          
+          {/* Integrated Footer Content */}
+          <div className="mt-12 pt-8 border-t border-black/5 flex flex-col md:flex-row justify-between items-center md:items-end gap-6 pb-4">
+            <div className="flex flex-col gap-2 items-center md:items-start text-center md:text-left">
+               <p className="text-[11px] text-[#86868b] font-medium tracking-wide">
+                 Copyright © {new Date().getFullYear()} Mohamed Elmugtaba. All rights reserved.
+               </p>
+               <p className="text-[11px] text-[#86868b] font-medium tracking-wide">
+                 Designed & Developed by M. Elmugtaba
+               </p>
+               <div className="flex items-center gap-1.5 opacity-80 hover:opacity-100 transition-opacity mt-1">
+                 <MapPin size={14} strokeWidth={1.5} className="text-[#1d1d1f]" />
+                 <span className="text-[11px] text-[#424245] font-medium">Riyadh, KSA</span>
+               </div>
+            </div>
+            <div className="flex items-center gap-5">
+               <a 
+                 href="https://github.com/mujtababarsi" 
+                 target="_blank" 
+                 rel="noreferrer"
+                 className="text-[#86868b] hover:text-[#1d1d1f] transition-colors duration-300"
+                 aria-label="GitHub"
+               >
+                 <Github size={16} strokeWidth={1.5} />
+               </a>
+               <a 
+                 href="mailto:Mujtababarsi@mail.com" 
+                 className="text-[#86868b] hover:text-[#1d1d1f] transition-colors duration-300"
+                 aria-label="Email"
+               >
+                 <Mail size={16} strokeWidth={1.5} />
+               </a>
             </div>
           </div>
         </div>
       </section>
-
-      <Footer />
 
       {/* Floating Action Button - Apple Style */}
       <motion.button 
