@@ -596,7 +596,7 @@ function Header() {
         <Dna className="text-[#0071e3] w-5 h-5" strokeWidth={2.5} />
         <span className="font-semibold text-[13px] tracking-wide uppercase text-[#1d1d1f]">M. Elmugtaba</span>
       </div>
-      <a href="mailto:Mujtababarsi@mail.com" className="pointer-events-auto bg-[#1d1d1f] text-white px-5 py-2.5 rounded-full text-[12px] font-medium tracking-wide shadow-lg hover:scale-105 active:scale-95 transition-all">Contact</a>
+      <a href="mailto:Mujtababarci@gmail.com" className="pointer-events-auto bg-[#1d1d1f] text-white px-5 py-2.5 rounded-full text-[12px] font-medium tracking-wide shadow-lg hover:scale-105 active:scale-95 transition-all">Contact</a>
     </header>
   );
 }
@@ -1379,7 +1379,7 @@ export default function App() {
                  <Github size={16} strokeWidth={1.5} />
                </a>
                <a 
-                 href="mailto:Mujtababarsi@mail.com" 
+                 href="mailto:Mujtababarci@gmail.com" 
                  className="text-[#86868b] hover:text-[#1d1d1f] transition-colors duration-300"
                  aria-label="Email"
                >
