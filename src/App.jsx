@@ -1279,7 +1279,7 @@ export default function App() {
                   <p className="text-xs font-medium text-[#0071e3] mt-1 mb-6">Bioinformatician & Pharmacist</p>
                   
                   <div className="flex gap-3 w-full justify-center relative z-10">
-                    <a href="mailto:Mujtababarsi@mail.com" className="p-3 rounded-full bg-white text-[#1d1d1f] hover:bg-[#0071e3] hover:text-white transition-all duration-300 shadow-sm border border-black/5">
+                    <a href="mailto:Mujtababarci@gmail.com" className="p-3 rounded-full bg-white text-[#1d1d1f] hover:bg-[#0071e3] hover:text-white transition-all duration-300 shadow-sm border border-black/5">
                       <Mail size={18} strokeWidth={2} />
                     </a>
                     <a href="https://github.com/mujtababarsi" target="_blank" className="p-3 rounded-full bg-white text-[#1d1d1f] hover:bg-[#0071e3] hover:text-white transition-all duration-300 shadow-sm border border-black/5">
@@ -1379,7 +1379,7 @@ export default function App() {
                  <Github size={16} strokeWidth={1.5} />
                </a>
                <a 
-                 href="mailto:Mujtababari@gmail.com" 
+                 href="mailto:Mujtababarci@gmail.com" 
                  className="text-[#86868b] hover:text-[#1d1d1f] transition-colors duration-300"
                  aria-label="Email"
                >
