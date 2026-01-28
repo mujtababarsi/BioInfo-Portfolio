@@ -17,8 +17,27 @@ import { motion, AnimatePresence, useInView, useScroll, useTransform, useSpring 
 // The onError handler in ProfilePicHolder will show a fallback icon if this fails.
 const PROFILE_IMAGE_URL = "./me.png"; 
 
-// The execution environment provides the key at runtime.
-const apiKey = ""; 
+// This logic automatically tries to find the key in environment variables first.
+// It supports both Vite (import.meta.env) and Create-React-App (process.env).
+const getApiKey = () => {
+  try {
+    if (typeof import.meta !== 'undefined' && import.meta.env?.VITE_GEMINI_API_KEY) {
+      return import.meta.env.VITE_GEMINI_API_KEY;
+    }
+  } catch (e) { /* ignore */ }
+  
+  try {
+    if (typeof process !== 'undefined' && process.env?.REACT_APP_GEMINI_API_KEY) {
+      return process.env.REACT_APP_GEMINI_API_KEY;
+    }
+  } catch (e) { /* ignore */ }
+
+  // Fallback: If you are testing locally and just want to paste it here TEMPORARILY:
+  // ONLY paste here if you are NOT pushing this file to GitHub.
+  return ""; 
+};
+
+const apiKey = getApiKey();
 
 const GENOMIC_DATA = [
   { pos: 0, depth: 45 }, { pos: 100, depth: 52 }, { pos: 200, depth: 89 },
@@ -245,6 +264,12 @@ const itemVariants = {
 // --- UTILITIES ---
 
 async function callGemini(prompt, systemInstruction = "") {
+  // Check if API key is configured (essential for external deployment)
+  if (!apiKey) {
+    console.error("Gemini API Key is missing. Please check your .env file or local configuration.");
+    return "Configuration Error: API Key is missing. The key was removed from the code for security. Please create a .env file with VITE_GEMINI_API_KEY or REACT_APP_GEMINI_API_KEY.";
+  }
+
   // Use the supported preview model
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
   
