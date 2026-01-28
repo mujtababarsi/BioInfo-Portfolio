@@ -13,27 +13,28 @@ import {
 import { motion, AnimatePresence, useInView, useScroll, useTransform, useSpring } from 'framer-motion';
 
 // --- CONFIGURATION & CONSTANTS ---
-// Note: In a real deployment, replace this with the actual image path.
-// The onError handler in ProfilePicHolder will show a fallback icon if this fails.
 const PROFILE_IMAGE_URL = "./me.png"; 
 
-// This logic automatically tries to find the key in environment variables first.
-// It supports both Vite (import.meta.env) and Create-React-App (process.env).
+// --------------------------------------------------------------------------
+// API KEY CONFIGURATION
+// Since you have fixed the .env location, this logic will now correctly
+// pull the key from VITE_GEMINI_API_KEY.
+// --------------------------------------------------------------------------
 const getApiKey = () => {
+  // 1. Check Vite (Standard for your project)
   try {
     if (typeof import.meta !== 'undefined' && import.meta.env?.VITE_GEMINI_API_KEY) {
       return import.meta.env.VITE_GEMINI_API_KEY;
     }
   } catch (e) { /* ignore */ }
   
+  // 2. Check Create-React-App (Fallback support)
   try {
     if (typeof process !== 'undefined' && process.env?.REACT_APP_GEMINI_API_KEY) {
       return process.env.REACT_APP_GEMINI_API_KEY;
     }
   } catch (e) { /* ignore */ }
 
-  // Fallback: If you are testing locally and just want to paste it here TEMPORARILY:
-  // ONLY paste here if you are NOT pushing this file to GitHub.
   return ""; 
 };
 
@@ -266,8 +267,8 @@ const itemVariants = {
 async function callGemini(prompt, systemInstruction = "") {
   // Check if API key is configured (essential for external deployment)
   if (!apiKey) {
-    console.error("Gemini API Key is missing. Please check your .env file or local configuration.");
-    return "Configuration Error: API Key is missing. The key was removed from the code for security. Please create a .env file with VITE_GEMINI_API_KEY or REACT_APP_GEMINI_API_KEY.";
+    console.error("Gemini API Key is missing. Please check your .env file configuration.");
+    return "Configuration Error: API Key is missing. Please ensure you have a .env file in your root folder with VITE_GEMINI_API_KEY defined.";
   }
 
   // Use the supported preview model
@@ -297,7 +298,7 @@ async function callGemini(prompt, systemInstruction = "") {
     return result.candidates?.[0]?.content?.parts?.[0]?.text || "No response generated.";
   } catch (err) {
     console.error("Gemini API Error:", err);
-    return "Error generating response. Please check API key configuration.";
+    return "Error generating response. Please check if your API key is valid.";
   }
 }
 
@@ -369,10 +370,17 @@ function ProfilePicHolder() {
   );
 }
 
-function AIProjectInsight({ project }) {
+function AIProjectInsight({ project, onOpenChange }) {
   const [insight, setInsight] = useState("");
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+
+  // Notify parent component when modal state changes
+  useEffect(() => {
+    if (onOpenChange) {
+      onOpenChange(isOpen);
+    }
+  }, [isOpen, onOpenChange]);
 
   async function getInsight() {
     if (insight) {
@@ -734,6 +742,10 @@ export default function App() {
   // Projects State
   const [projectIndex, setProjectIndex] = useState(0);
   const autoSlideRef = useRef(null);
+  
+  // Track specific interaction states to manage auto-slide intelligently
+  const [isAiModalOpen, setIsAiModalOpen] = useState(false);
+  const isHovering = useRef(false);
     
   // Experience State - using selection instead of scroll
   const [selectedExpIndex, setSelectedExpIndex] = useState(0);
@@ -786,10 +798,23 @@ export default function App() {
 
   const startAutoSlide = () => {
     stopAutoSlide();
+    // CRITICAL FIX: Only start sliding if NO modal is open AND user is NOT hovering
+    if (isAiModalOpen || isHovering.current) return;
+    
     autoSlideRef.current = setInterval(() => {
       setProjectIndex((prev) => (prev + 2) % PROJECTS.length);
     }, 6000);
   };
+
+  // Effect to manage slide state when AI modal state changes
+  useEffect(() => {
+    if (isAiModalOpen) {
+      stopAutoSlide();
+    } else if (!isHovering.current) {
+      // Only restart if not hovering (e.g. user closed modal but moved mouse out)
+      startAutoSlide();
+    }
+  }, [isAiModalOpen]);
 
   useEffect(() => {
     startAutoSlide();
@@ -799,6 +824,17 @@ export default function App() {
   const handleManualNextProject = () => {
     setProjectIndex((prev) => (prev + 2) % PROJECTS.length);
     startAutoSlide(); 
+  };
+
+  const handleMouseEnter = () => {
+    isHovering.current = true;
+    stopAutoSlide();
+  };
+
+  const handleMouseLeave = () => {
+    isHovering.current = false;
+    // Delay start slightly to avoid jitter if accidentally moving out and back in
+    startAutoSlide();
   };
     
   const visibleProjects = PROJECTS.slice(projectIndex, projectIndex + 2);
@@ -1069,8 +1105,8 @@ export default function App() {
           {/* Fixed height container to prevent layout shifts - Reduced height */}
           <div 
             className="relative grid grid-cols-1 h-[29rem] md:h-[26rem]"
-            onMouseEnter={stopAutoSlide}
-            onMouseLeave={startAutoSlide}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
           > 
             <AnimatePresence initial={false}>
               <motion.div 
@@ -1134,7 +1170,7 @@ export default function App() {
                        </div>
 
                        {/* Add the AI Insight Component here */}
-                       <AIProjectInsight project={p} />
+                       <AIProjectInsight project={p} onOpenChange={setIsAiModalOpen} />
                    </div>
                  </div>
                ))}
