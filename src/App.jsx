@@ -13,7 +13,11 @@ import {
 import { motion, AnimatePresence, useInView, useScroll, useTransform, useSpring } from 'framer-motion';
 
 // --- CONFIGURATION & CONSTANTS ---
+// Note: In a real deployment, replace this with the actual image path.
+// The onError handler in ProfilePicHolder will show a fallback icon if this fails.
 const PROFILE_IMAGE_URL = "./me.png"; 
+
+// The execution environment provides the key at runtime.
 const apiKey = ""; 
 
 const GENOMIC_DATA = [
@@ -241,6 +245,7 @@ const itemVariants = {
 // --- UTILITIES ---
 
 async function callGemini(prompt, systemInstruction = "") {
+  // Use the supported preview model
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
   
   const payload = {
@@ -278,7 +283,7 @@ function ParallaxBackground() {
   const y1 = useTransform(scrollYProgress, [0, 1], [0, -150]);
   const y2 = useTransform(scrollYProgress, [0, 1], [0, 150]);
   const rotate = useTransform(scrollYProgress, [0, 1], [0, 20]);
-   
+    
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
        <motion.div style={{ y: y1, rotate }} className="absolute top-[5%] right-[-5%] w-[500px] h-[500px] bg-blue-100/20 rounded-full blur-3xl opacity-50" />
@@ -401,7 +406,7 @@ function AICopilotModal({ isOpen, onClose }) {
         className="absolute inset-0 bg-black/20 backdrop-blur-md" 
         onClick={onClose} 
       />
-       
+        
       <motion.div 
         initial={{ opacity: 0, scale: 0.95, y: 10 }} 
         animate={{ opacity: 1, scale: 1, y: 0 }} 
@@ -535,8 +540,6 @@ function Navbar({ scrollTo }) {
   );
 }
 
-// Removed standalone Footer component to integrate into Personal Details section
-
 function TypewriterText() {
   const segments = [
     { text: '"Bridging ', bold: false },
@@ -667,7 +670,7 @@ export default function App() {
   // Projects State
   const [projectIndex, setProjectIndex] = useState(0);
   const autoSlideRef = useRef(null);
-   
+    
   // Experience State - using selection instead of scroll
   const [selectedExpIndex, setSelectedExpIndex] = useState(0);
 
@@ -729,12 +732,12 @@ export default function App() {
     setProjectIndex((prev) => (prev + 2) % PROJECTS.length);
     resetAutoSlide(); 
   };
-   
+    
   const visibleProjects = PROJECTS.slice(projectIndex, projectIndex + 2);
 
   // --- EXPERIENCE LOGIC (INTERVAL BASED CAROUSEL) ---
   // Re-added for continuous flow
-   
+    
   // Scroll Spy Logic for Active Section
   const handleScroll = (e) => {
     const container = e.target;
@@ -833,7 +836,7 @@ export default function App() {
       {/* ME Section - ENHANCED VISUALS */}
       <section id="me" className="snap-start min-h-screen pt-28 pb-16 bg-gradient-to-br from-white via-indigo-50/10 to-blue-50/10 flex items-start justify-center relative overflow-hidden">
         <ParallaxBackground />
-         
+          
         <div className="max-w-7xl mx-auto px-6 w-full relative z-10">
           <SectionHeading title="At the Intersection of Pharmacy & Bioinformatics" subtitle="Bridging clinical expertise with computational precision." />
           <motion.div 
@@ -908,7 +911,7 @@ export default function App() {
                 {/* Icon Header */}
                 <div className="flex items-center gap-4 mb-4">
                   <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-blue-50 to-indigo-50 text-[#0071e3] flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-sm border border-blue-100/50">
-                     {React.cloneElement(area.icon, { size: 20, strokeWidth: 1.5 })}
+                      {React.cloneElement(area.icon, { size: 20, strokeWidth: 1.5 })}
                   </div>
                   <h3 className="text-lg font-bold text-[#1d1d1f] tracking-tight">{area.title}</h3>
                 </div>
@@ -988,13 +991,13 @@ export default function App() {
       {/* PROJECTS: RESTORED TO LIGHT THEME - ENHANCED (DEPTH TEXTURE) */}
       <section id="projects" className="snap-start min-h-screen pt-12 pb-12 bg-[#F5F5F7] flex items-start justify-center relative overflow-hidden">
         <ParallaxBackground />
-         
+          
         <div className="max-w-4xl mx-auto px-6 w-full relative z-10">
           <div className="mb-8 text-center px-4">
              <h2 className="text-xl md:text-2xl font-bold text-[#1d1d1f] tracking-tight">Selected Projects</h2>
              <div className="w-12 h-1 bg-[#0071e3]/20 mx-auto rounded-full my-3" />
           </div>
-           
+            
           {/* Fixed height container to prevent layout shifts - Reduced height */}
           <div className="relative grid grid-cols-1 h-[29rem] md:h-[26rem]"> 
             <AnimatePresence initial={false}>
@@ -1049,27 +1052,22 @@ export default function App() {
 
                         <div className="flex gap-2 mt-auto">
                             <a 
-                                href={p.link} 
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                                className="flex-1 bg-[#1d1d1f] hover:bg-[#0071e3] text-white text-[11px] font-bold py-2.5 rounded-xl transition-all shadow-md shadow-black/10 hover:shadow-blue-500/40 flex items-center justify-center gap-1 active:scale-95"
+                               href={p.link}
+                               target="_blank"
+                               rel="noopener noreferrer"
+                               className="w-full bg-[#1d1d1f] hover:bg-[#0071e3] text-white text-[13px] font-bold py-3 rounded-xl transition-all shadow-md shadow-black/10 hover:shadow-blue-500/40 flex items-center justify-center gap-2 active:scale-95 group/btn"
                             >
-                                View Project <ArrowRight size={12} />
+                               View Project <ArrowRight size={16} className="group-hover/btn:translate-x-1 transition-transform" />
                             </a>
-                             <a 
-                                href={p.link}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="px-3 bg-white hover:bg-gray-50 text-[#1d1d1f] rounded-xl border border-black/10 transition-colors shadow-sm hover:shadow-md flex items-center justify-center"
-                             >
-                                <Github size={14} />
-                             </a>
-                        </div>
-                    </div>
-                  </div>
-                ))}
-              </motion.div>
-            </AnimatePresence>
+                       </div>
+
+                       {/* Add the AI Insight Component here */}
+                       <AIProjectInsight project={p} />
+                   </div>
+                 </div>
+               ))}
+             </motion.div>
+           </AnimatePresence>
 
             {/* Floating Navigation Button (Blue Accent) */}
             <button 
@@ -1202,7 +1200,7 @@ export default function App() {
       <section className="snap-start min-h-screen pt-16 pb-32 bg-white relative flex items-start justify-center overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:20px_20px] opacity-40 pointer-events-none" />
         <ParallaxBackground />
-         
+          
         <div className="max-w-7xl mx-auto px-6 w-full relative z-10">
           <SectionHeading title="Certifications & Professional Development" />
           <motion.div 
@@ -1272,7 +1270,10 @@ export default function App() {
                   <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-b from-[#0071e3]/5 to-transparent transition-opacity duration-500 group-hover:opacity-80" />
                   
                   <div className="relative w-24 h-24 rounded-full overflow-hidden ring-4 ring-white shadow-xl mb-6 group-hover:scale-105 transition-transform duration-500">
-                      <img src={PROFILE_IMAGE_URL} alt="Profile" className="w-full h-full object-cover" />
+                      <img src={PROFILE_IMAGE_URL} alt="Profile" onError={(e) => e.target.style.display = 'none'} className="w-full h-full object-cover" />
+                      <div className="absolute inset-0 flex items-center justify-center bg-gray-100 -z-10">
+                        <User size={32} className="text-gray-400" />
+                      </div>
                   </div>
                   
                   <h3 className="text-lg font-bold text-[#1d1d1f] tracking-tight">M. Elmugtaba</h3>
