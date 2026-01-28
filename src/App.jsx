@@ -1379,7 +1379,7 @@ export default function App() {
                  <Github size={16} strokeWidth={1.5} />
                </a>
                <a 
-                 href="mailto:Mujtababarci@gmail.com" 
+                 href="mailto:Mujtababari@gmail.com" 
                  className="text-[#86868b] hover:text-[#1d1d1f] transition-colors duration-300"
                  aria-label="Email"
                >
